@@ -253,13 +253,20 @@ window.addEventListener('load', () => {
   if (window.gsap && window.ScrollTrigger) {
     gsap.registerPlugin(ScrollTrigger);
     revealEls.forEach((el) => {
-      gsap.set(el, { autoAlpha: 1 });
-      gsap.from(el, {
-        y: 14,
-        autoAlpha: 0,
-        duration: 0.32,
+      // CSS transitions and JS tweening fight each other during fast scrolls.
+      // Let GSAP own the reveal until it completes, then restore the CSS state.
+      el.style.transition = 'none';
+      gsap.fromTo(el, { y: 14, autoAlpha: 0 }, {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.28,
         ease: 'power2.out',
-        scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+        onComplete: () => {
+          el.classList.add('in-view');
+          el.style.transition = '';
+          gsap.set(el, { clearProps: 'transform,opacity,visibility' });
+        },
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true, fastScrollEnd: true }
       });
     });
     ScrollTrigger.refresh();
@@ -267,34 +274,6 @@ window.addEventListener('load', () => {
   }
   enableNativeReveals();
 }, { once: true });
-
-// Smooth scroll (Lenis) — falls back gracefully to the native
-// `scroll-behavior:smooth` already set on <html> if the CDN script
-// fails to load (e.g. offline) or the user prefers reduced motion.
-window.addEventListener('load', () => {
-  if (window.Lenis && !prefersReducedMotion) {
-    const lenis = new Lenis({
-      duration: 0.65,
-      smoothWheel: true,
-      wheelMultiplier: 1.15,
-      touchMultiplier: 1.1
-    });
-    function raf(time){ lenis.raf(time); requestAnimationFrame(raf); }
-    requestAnimationFrame(raf);
-
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-      a.addEventListener('click', (e) => {
-        const id = a.getAttribute('href');
-        if (!id || id === '#') return;
-        const target = document.querySelector(id);
-        if (target) {
-          e.preventDefault();
-          lenis.scrollTo(target, { offset: -70 });
-        }
-      });
-    });
-  }
-});
 
 // FAQ accordion — only one answer open at a time. The `name` attribute on
 // each <details> already does this natively in modern browsers; this
