@@ -255,9 +255,9 @@ window.addEventListener('load', () => {
     revealEls.forEach((el) => {
       gsap.set(el, { autoAlpha: 1 });
       gsap.from(el, {
-        y: 22,
+        y: 14,
         autoAlpha: 0,
-        duration: 0.55,
+        duration: 0.32,
         ease: 'power2.out',
         scrollTrigger: { trigger: el, start: 'top 88%', once: true }
       });
@@ -273,7 +273,12 @@ window.addEventListener('load', () => {
 // fails to load (e.g. offline) or the user prefers reduced motion.
 window.addEventListener('load', () => {
   if (window.Lenis && !prefersReducedMotion) {
-    const lenis = new Lenis({ duration: 1.1, smoothWheel: true });
+    const lenis = new Lenis({
+      duration: 0.65,
+      smoothWheel: true,
+      wheelMultiplier: 1.15,
+      touchMultiplier: 1.1
+    });
     function raf(time){ lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
 
