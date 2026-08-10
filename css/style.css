@@ -38,7 +38,7 @@ html{scroll-behavior:smooth;}
 body{
   background:var(--bg);
   color:var(--white);
-  font-family:'Rajdhani',sans-serif;
+  font-family:'Chakra Petch',sans-serif;
   overflow-x:hidden;
   position:relative;
 }
@@ -65,7 +65,7 @@ body::before{
 
 a{color:inherit;text-decoration:none;}
 .mono{font-family:'Share Tech Mono',monospace;}
-.pixel{font-family:'Barlow Condensed',sans-serif;}
+.pixel{font-family:'Press Start 2P',monospace;}
 .accent{color:var(--neon);}
 
 .pixel-divider{
@@ -137,7 +137,6 @@ nav{
 }
 .logo{display:flex;align-items:center;gap:12px;}
 .logo-box{width:38px;height:38px;}
-.brand-emblem{display:grid;place-items:center;width:100%;height:100%;color:var(--neon);font-size:24px;text-shadow:0 0 10px var(--neon-glow);}
 .logo-box .pixel-frame-inner{display:flex;align-items:center;justify-content:center;}
 .logo-box svg{color:var(--neon);}
 .logo-text{font-family:'Press Start 2P',monospace;font-size:14px;letter-spacing:1px;}
@@ -552,17 +551,6 @@ footer .logo-text{font-size:12px;}
 
 /* ---------- BATTLECITIES COMMAND THEME ---------- */
 /* Semantic game tokens: gold commands, blue player-tech, green supplies. */
-.logo-text,.eyebrow,.hero h1,.hero-stats .num,.sec-tag,.sec-head h2,
-.alloc-top .pct,.danger-badge,.tl-marker,.cds-title,.cds-clock .box .n,
-.cds-colon,.notify-title,.progress-top .raised,.stage .price,.input-box input{
-  font-family:'Barlow Condensed',sans-serif;
-  font-weight:800;
-  letter-spacing:.055em;
-}
-.navlinks,.navcta,.btn,.buy-tab,.faq-item summary,.bn-item{
-  font-family:'Barlow Condensed',sans-serif;
-  font-weight:700;
-}
 .hero{
   background:
     radial-gradient(circle at 12% 20%,rgb(22 119 255 / 24%),transparent 32%),
