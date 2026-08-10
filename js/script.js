@@ -212,21 +212,14 @@ trackedSections.forEach(id => {
 // Skipped entirely (all elements shown immediately) if the user prefers reduced motion.
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const revealEls = document.querySelectorAll('.reveal');
-if (prefersReducedMotion) {
-  revealEls.forEach(el => el.classList.add('in-view'));
-} else {
-  // IntersectionObserver can miss an element when Lenis carries the page past
-  // it in one momentum frame. This helper also runs on scroll, so a skipped
-  // reveal never remains hidden after it has passed through the viewport.
+function enableNativeReveals(){
   const revealElement = (el) => {
     el.classList.add('in-view');
     revealObserver.unobserve(el);
   };
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        revealElement(entry.target);
-      }
+      if (entry.isIntersecting) revealElement(entry.target);
     });
   }, { threshold: 0, rootMargin: '0px 0px -8% 0px' });
   revealEls.forEach(el => revealObserver.observe(el));
@@ -248,6 +241,32 @@ if (prefersReducedMotion) {
   window.addEventListener('resize', queueRevealCheck);
   queueRevealCheck();
 }
+
+// ScrollTrigger observes the actual scroll position instead of relying only
+// on intersection events, so momentum scrolling cannot strand a section at
+// opacity: 0. The native path keeps the site usable if the CDN is unavailable.
+window.addEventListener('load', () => {
+  if (prefersReducedMotion) {
+    revealEls.forEach(el => el.classList.add('in-view'));
+    return;
+  }
+  if (window.gsap && window.ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
+    revealEls.forEach((el) => {
+      gsap.set(el, { autoAlpha: 1 });
+      gsap.from(el, {
+        y: 22,
+        autoAlpha: 0,
+        duration: 0.55,
+        ease: 'power2.out',
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+      });
+    });
+    ScrollTrigger.refresh();
+    return;
+  }
+  enableNativeReveals();
+}, { once: true });
 
 // Smooth scroll (Lenis) — falls back gracefully to the native
 // `scroll-behavior:smooth` already set on <html> if the CDN script
