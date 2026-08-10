@@ -215,15 +215,38 @@ const revealEls = document.querySelectorAll('.reveal');
 if (prefersReducedMotion) {
   revealEls.forEach(el => el.classList.add('in-view'));
 } else {
+  // IntersectionObserver can miss an element when Lenis carries the page past
+  // it in one momentum frame. This helper also runs on scroll, so a skipped
+  // reveal never remains hidden after it has passed through the viewport.
+  const revealElement = (el) => {
+    el.classList.add('in-view');
+    revealObserver.unobserve(el);
+  };
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        entry.target.classList.add('in-view');
-        revealObserver.unobserve(entry.target);
+        revealElement(entry.target);
       }
     });
-  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+  }, { threshold: 0, rootMargin: '0px 0px -8% 0px' });
   revealEls.forEach(el => revealObserver.observe(el));
+
+  let revealFrame = null;
+  const revealSkippedSections = () => {
+    revealFrame = null;
+    revealEls.forEach(el => {
+      if (el.classList.contains('in-view')) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.top <= window.innerHeight * 0.9) revealElement(el);
+    });
+  };
+  const queueRevealCheck = () => {
+    if (revealFrame !== null) return;
+    revealFrame = requestAnimationFrame(revealSkippedSections);
+  };
+  window.addEventListener('scroll', queueRevealCheck, { passive: true });
+  window.addEventListener('resize', queueRevealCheck);
+  queueRevealCheck();
 }
 
 // Smooth scroll (Lenis) — falls back gracefully to the native
