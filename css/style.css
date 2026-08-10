@@ -16,6 +16,8 @@
   --blue:#1677ff;
   --blue-glow:rgba(112,183,255,.38);
   --supply:#47de17;
+  --shop-button:#105b0c;
+  --shop-button-edge:#4aa82d;
   --ember:#ff6a1a;
   --nav-h:70px;
   --hazard-h:38px;
@@ -145,7 +147,7 @@ nav{
 .navlinks a:hover{opacity:1;color:var(--neon);}
 .navcta{
   font-family:'Chakra Petch';font-weight:700;
-  border:2px solid #000;background:var(--neon);color:#04120a;
+  border:2px solid var(--shop-button-edge);background:var(--shop-button);color:var(--white);
   padding:10px 18px;font-size:12px;text-transform:uppercase;letter-spacing:1px;
   box-shadow:4px 4px 0 #000;transition:.15s;display:flex;align-items:center;gap:8px;
 }
@@ -233,7 +235,7 @@ section{position:relative;z-index:1;padding:70px 5% 90px;scroll-margin-top:var(-
   font-size:14px;padding:16px 30px;cursor:pointer;border:2px solid #000;transition:.15s;
   display:inline-flex;align-items:center;gap:10px;
 }
-.btn-primary{background:var(--neon);color:#04120a;box-shadow:5px 5px 0 #000;}
+.btn-primary{background:var(--shop-button);border-color:var(--shop-button-edge);color:var(--white);box-shadow:5px 5px 0 #000;}
 .btn-primary:hover{transform:translate(3px,3px);box-shadow:2px 2px 0 #000;}
 .btn-primary:active{transform:translate(5px,5px);box-shadow:0 0 0 #000;}
 .btn-ghost{background:transparent;border:2px solid var(--gray);color:var(--white);box-shadow:5px 5px 0 rgba(0,0,0,.4);}
