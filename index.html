@@ -3,22 +3,103 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="BattleCities is coming soon." />
-    <title>BattleCities</title>
+    <meta name="description" content="BattleCities — a pixel-powered community campaign." />
+    <title>BattleCities — The chain is our battlefield</title>
     <style>
-      :root { color-scheme: dark; font-family: system-ui, sans-serif; }
-      body { align-items: center; background: #10151f; color: #f7f5ef; display: grid; margin: 0; min-height: 100svh; place-items: center; }
-      main { max-width: 40rem; padding: 2rem; text-align: center; }
-      h1 { color: #ffcf4a; font-size: clamp(2.5rem, 10vw, 5.5rem); margin: 0; text-transform: uppercase; }
-      p { color: #bac5d1; font-size: 1.2rem; line-height: 1.6; }
-      a { color: #ffcf4a; }
+      :root { --ink:#0a0e1a; --panel:#11182a; --panel-2:#172039; --line:#35415e; --text:#f4f6ff; --muted:#aab5cf; --lime:#d9ff4b; --cyan:#50e8ff; --pink:#ff4fc3; --orange:#ff9e3d; --radius:18px; }
+      * { box-sizing:border-box; }
+      html { scroll-behavior:smooth; }
+      body { margin:0; color:var(--text); background:var(--ink); font-family:Arial, Helvetica, sans-serif; line-height:1.5; overflow-x:hidden; }
+      body::before { content:""; position:fixed; inset:0; pointer-events:none; opacity:.22; z-index:-1; background-image:linear-gradient(rgba(80,232,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(80,232,255,.07) 1px,transparent 1px); background-size:34px 34px; mask-image:linear-gradient(#000,transparent 85%); }
+      a { color:inherit; text-decoration:none; }
+      button { font:inherit; }
+      .container { width:min(1160px, calc(100% - 40px)); margin:auto; }
+      .eyebrow { display:inline-flex; gap:9px; align-items:center; color:var(--lime); font-family:monospace; font-size:.75rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
+      .eyebrow::before { content:""; width:8px; height:8px; background:var(--lime); box-shadow:0 0 14px var(--lime); }
+      .button { min-height:46px; display:inline-flex; align-items:center; justify-content:center; gap:9px; padding:10px 20px; border:1px solid var(--lime); border-radius:8px; color:#10150c; background:var(--lime); box-shadow:4px 4px 0 #829b18; font-weight:900; letter-spacing:.04em; text-transform:uppercase; transition:transform 150ms ease-out,box-shadow 150ms ease-out,background-color 100ms ease-out; }
+      .button:hover { transform:translate(2px,2px); box-shadow:2px 2px 0 #829b18; }
+      .button:active { transform:translate(4px,4px); box-shadow:none; }
+      .button.secondary { color:var(--text); background:rgba(17,24,42,.65); border-color:var(--cyan); box-shadow:4px 4px 0 #16778b; }
+      .button:focus-visible, .nav-link:focus-visible, summary:focus-visible { outline:3px solid var(--pink); outline-offset:4px; }
+      .site-header { position:sticky; top:0; z-index:10; border-bottom:1px solid rgba(80,232,255,.2); background:rgba(10,14,26,.88); backdrop-filter:blur(16px); }
+      .nav { height:78px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+      .brand { display:flex; align-items:center; gap:10px; color:var(--text); font-family:monospace; font-size:1.22rem; font-weight:900; letter-spacing:.07em; text-transform:uppercase; }
+      .brand-mark { width:32px; height:28px; position:relative; background:var(--lime); box-shadow:4px 4px 0 var(--pink); }
+      .brand-mark::before { content:""; position:absolute; width:12px; height:12px; left:10px; top:8px; background:var(--ink); box-shadow:-7px 7px 0 var(--ink),7px 7px 0 var(--ink); }
+      .links { display:flex; align-items:center; gap:22px; }
+      .nav-link { color:var(--muted); font-size:.78rem; font-weight:800; letter-spacing:.07em; text-transform:uppercase; transition:color 100ms ease-out; }
+      .nav-link:hover { color:var(--lime); }
+      .menu { display:none; min-width:44px; min-height:44px; color:var(--text); background:transparent; border:1px solid var(--line); border-radius:8px; }
+      .hero { position:relative; padding:84px 0 72px; overflow:hidden; }
+      .hero::after { content:""; position:absolute; width:600px; height:600px; right:-220px; top:-170px; border:2px solid rgba(80,232,255,.18); border-radius:50%; box-shadow:0 0 0 44px rgba(80,232,255,.04),0 0 0 92px rgba(80,232,255,.03); }
+      .hero-grid { display:grid; grid-template-columns:1.05fr .95fr; gap:56px; align-items:center; }
+      h1,h2,h3,p { margin-top:0; }
+      h1 { max-width:700px; margin:15px 0 20px; font-family:Impact, "Arial Black", sans-serif; font-size:clamp(3.6rem,8vw,7.1rem); font-weight:900; line-height:.88; letter-spacing:.015em; text-transform:uppercase; text-shadow:5px 5px 0 var(--pink); }
+      h1 span { color:var(--lime); }
+      .hero-copy { max-width:570px; color:var(--muted); font-size:1.08rem; }
+      .hero-actions { display:flex; gap:16px; flex-wrap:wrap; margin:30px 0 36px; }
+      .mini-stats { display:flex; flex-wrap:wrap; gap:28px; padding-top:22px; border-top:1px solid var(--line); }
+      .mini-stats strong { display:block; color:var(--cyan); font-family:monospace; font-size:1.25rem; }
+      .mini-stats span { color:var(--muted); font-size:.72rem; font-weight:bold; letter-spacing:.08em; text-transform:uppercase; }
+      .battle-card { position:relative; min-height:430px; padding:24px; display:flex; flex-direction:column; justify-content:space-between; border:1px solid var(--cyan); border-radius:var(--radius); background:linear-gradient(145deg,rgba(23,32,57,.98),rgba(12,18,32,.98)); box-shadow:10px 10px 0 rgba(255,79,195,.35); overflow:hidden; }
+      .battle-card::before { content:""; position:absolute; inset:0; opacity:.5; background:repeating-linear-gradient(90deg,transparent 0 35px,rgba(80,232,255,.08) 36px),repeating-linear-gradient(0deg,transparent 0 35px,rgba(80,232,255,.08) 36px); }
+      .card-top,.battle-visual,.card-bottom { position:relative; z-index:1; }
+      .card-top { display:flex; justify-content:space-between; color:var(--muted); font-family:monospace; font-size:.77rem; }
+      .live { color:var(--lime); }
+      .live::before { content:"● "; }
+      .battle-visual { width:230px; height:170px; margin:auto; position:relative; }
+      .tank { position:absolute; inset:44px 18px 18px; background:var(--lime); border:8px solid var(--ink); box-shadow:8px 8px 0 var(--pink), -8px -8px 0 var(--cyan); }
+      .tank::before { content:""; position:absolute; width:106px; height:26px; top:-34px; left:39px; background:var(--lime); border:8px solid var(--ink); }
+      .tank::after { content:""; position:absolute; width:68px; height:20px; top:14px; right:-70px; background:var(--lime); border:7px solid var(--ink); }
+      .pixel { position:absolute; width:14px; height:14px; background:var(--orange); box-shadow:0 0 16px var(--orange); }
+      .p1 { top:12px; left:0; } .p2 { right:13px; bottom:9px; background:var(--pink); box-shadow:0 0 16px var(--pink); } .p3 { left:16px; bottom:18px; background:var(--cyan); box-shadow:0 0 16px var(--cyan); }
+      .progress-label { display:flex; justify-content:space-between; color:var(--muted); font-size:.76rem; font-weight:bold; text-transform:uppercase; }
+      .progress { height:13px; margin:10px 0 18px; border:1px solid var(--line); background:var(--ink); }
+      .progress b { display:block; width:67%; height:100%; background:repeating-linear-gradient(90deg,var(--lime) 0 12px,#a6c72f 12px 16px); }
+      section { padding:90px 0; }
+      .section-heading { max-width:660px; margin-bottom:42px; }
+      h2 { margin:12px 0; font-family:Impact,"Arial Black",sans-serif; font-size:clamp(2.45rem,5vw,4.3rem); letter-spacing:.02em; line-height:.95; text-transform:uppercase; }
+      .section-heading p { color:var(--muted); }
+      .about { background:linear-gradient(180deg,transparent,rgba(23,32,57,.48),transparent); border-block:1px solid rgba(80,232,255,.14); }
+      .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:28px; }
+      .terminal { padding:28px; border:1px solid var(--line); border-radius:var(--radius); background:var(--panel); }
+      .terminal-header { display:flex; gap:7px; margin-bottom:28px; } .terminal-header i { width:10px; height:10px; background:var(--pink); } .terminal-header i:nth-child(2) { background:var(--orange); } .terminal-header i:nth-child(3) { background:var(--lime); }
+      .terminal code { color:var(--cyan); font-family:monospace; font-size:.93rem; line-height:2; } .terminal code b { color:var(--lime); }
+      .features { display:grid; gap:14px; }
+      .feature { padding:19px; border-left:3px solid var(--pink); background:rgba(17,24,42,.82); }
+      .feature strong { display:block; margin-bottom:4px; font-family:monospace; text-transform:uppercase; } .feature span { color:var(--muted); font-size:.92rem; }
+      .tokenomics { display:grid; grid-template-columns:1fr 1.1fr; gap:32px; align-items:center; }
+      .donut { width:min(100%,330px); aspect-ratio:1; margin:auto; display:grid; place-items:center; border-radius:50%; background:conic-gradient(var(--lime) 0 40%,var(--cyan) 40% 65%,var(--pink) 65% 85%,var(--orange) 85% 100%); box-shadow:0 0 0 16px var(--panel),0 0 0 17px var(--line); }
+      .donut-inner { width:67%; aspect-ratio:1; display:grid; place-items:center; text-align:center; border-radius:50%; background:var(--ink); font-family:monospace; } .donut-inner b { color:var(--lime); font-size:1.3rem; } .donut-inner span { color:var(--muted); font-size:.7rem; }
+      .allocation { display:grid; gap:14px; }
+      .allocation div { display:grid; grid-template-columns:17px 1fr auto; gap:10px; align-items:center; padding-bottom:13px; border-bottom:1px solid var(--line); font-family:monospace; } .dot { width:12px; height:12px; background:var(--lime); } .allocation div:nth-child(2) .dot { background:var(--cyan); } .allocation div:nth-child(3) .dot { background:var(--pink); } .allocation div:nth-child(4) .dot { background:var(--orange); } .allocation span { color:var(--muted); }
+      .roadmap { position:relative; display:grid; grid-template-columns:repeat(4,1fr); gap:16px; } .roadmap::before { content:""; position:absolute; left:9%; right:9%; top:23px; height:2px; background:var(--line); }
+      .phase { position:relative; padding:0 16px 22px; } .phase::before { content:""; display:block; width:48px; height:48px; margin-bottom:22px; border:9px solid var(--ink); border-radius:50%; background:var(--cyan); box-shadow:0 0 0 2px var(--cyan); } .phase.active::before { background:var(--lime); box-shadow:0 0 0 2px var(--lime),0 0 20px rgba(217,255,75,.5); } .phase h3 { font-family:monospace; font-size:.85rem; letter-spacing:.05em; text-transform:uppercase; } .phase p { color:var(--muted); font-size:.9rem; }
+      .buy-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; } .step { min-height:204px; padding:25px; border:1px solid var(--line); border-radius:var(--radius); background:var(--panel); } .step-number { color:var(--pink); font-family:Impact,sans-serif; font-size:3.2rem; line-height:1; } .step p { color:var(--muted); }
+      .faq { max-width:800px; } details { margin-bottom:10px; border:1px solid var(--line); background:var(--panel); } summary { min-height:58px; padding:18px 50px 18px 19px; position:relative; cursor:pointer; list-style:none; font-weight:800; } summary::after { content:"+"; position:absolute; right:20px; color:var(--lime); font-size:1.4rem; } details[open] summary::after { content:"−"; } details p { padding:0 19px 20px; margin:0; color:var(--muted); }
+      .cta { padding:74px 0; background:var(--lime); color:#10150c; } .cta .eyebrow { color:#10150c; } .cta-grid { display:flex; align-items:center; justify-content:space-between; gap:28px; } .cta h2 { max-width:620px; margin:0; text-shadow:4px 4px 0 var(--pink); } .cta .button { border-color:#10150c; background:#10150c; color:var(--lime); box-shadow:4px 4px 0 var(--pink); }
+      footer { padding:35px 0; background:#070a12; } .footer-row { display:flex; justify-content:space-between; gap:20px; align-items:center; color:var(--muted); font-size:.8rem; } .socials { display:flex; gap:12px; } .socials a { min-width:40px; min-height:40px; display:grid; place-items:center; border:1px solid var(--line); color:var(--cyan); font-family:monospace; font-weight:bold; }
+      @media (max-width:800px) { .links { display:none; position:absolute; top:78px; left:0; right:0; padding:22px; flex-direction:column; align-items:stretch; background:var(--panel); border-bottom:1px solid var(--line); } .links.open { display:flex; } .menu { display:block; } .hero-grid,.about-grid,.tokenomics { grid-template-columns:1fr; } .battle-card { min-height:350px; } .roadmap { grid-template-columns:1fr 1fr; } .roadmap::before { display:none; } .buy-grid { grid-template-columns:1fr; } .cta-grid { display:block; } .cta .button { margin-top:24px; } }
+      @media (max-width:490px) { .container { width:min(100% - 28px,1160px); } .hero { padding-top:56px; } h1 { font-size:3.65rem; } .roadmap { grid-template-columns:1fr; } .mini-stats { gap:17px; } .footer-row { align-items:flex-start; flex-direction:column; } }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } *,*::before,*::after { transition-duration:0ms !important; animation-duration:0ms !important; } }
     </style>
   </head>
   <body>
-    <main>
-      <h1>BattleCities</h1>
-      <p>The site is online. This is the initial GitHub Pages test page.</p>
-      <a href="test.html">Open the test page</a>
+    <header class="site-header"><nav class="nav container" aria-label="Main navigation"><a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>BattleCities</a><button class="menu" type="button" aria-label="Open navigation menu" aria-expanded="false">☰</button><div class="links"><a class="nav-link" href="#about">Intel</a><a class="nav-link" href="#tokenomics">Tokenomics</a><a class="nav-link" href="#roadmap">Roadmap</a><a class="nav-link" href="#buy">How to join</a><a class="button" href="#join">Enter battle ↗</a></div></nav></header>
+    <main id="top">
+      <section class="hero"><div class="container hero-grid"><div><span class="eyebrow">Protocol online // season one</span><h1>The chain is our <span>battlefield.</span></h1><p class="hero-copy">BattleCities is a pixel-powered Web3 campaign where every holder helps rebuild, defend, and expand the last city standing.</p><div class="hero-actions"><a class="button" href="#join">Join the campaign ↗</a><a class="button secondary" href="#about">View intelligence ↓</a></div><div class="mini-stats"><div><strong>10,000,000</strong><span>Total supply</span></div><div><strong>0%</strong><span>Buy tax</span></div><div><strong>24/7</strong><span>City defense</span></div></div></div><aside class="battle-card" aria-label="BattleCities presale progress"><div class="card-top"><span>BCITY // PRESALE</span><span class="live">LIVE</span></div><div class="battle-visual" aria-hidden="true"><i class="pixel p1"></i><i class="pixel p2"></i><i class="pixel p3"></i><div class="tank"></div></div><div class="card-bottom"><div class="progress-label"><span>Phase 02 of 03</span><span>67% secured</span></div><div class="progress"><b></b></div><a class="button" href="#join">Secure your place ↗</a></div></aside></div></section>
+      <section id="about" class="about"><div class="container"><div class="section-heading"><span class="eyebrow">Mission briefing</span><h2>A city worth fighting for.</h2><p>We’re building a community-led battlefield for the terminally online: play hard, create lore, and make every milestone matter.</p></div><div class="about-grid"><div class="terminal"><div class="terminal-header"><i></i><i></i><i></i></div><code><b>&gt; SYSTEM:</b> BattleCities network initialized<br><b>&gt; OBJECTIVE:</b> Build the strongest city on-chain<br><b>&gt; STATUS:</b> Community recruitment underway<br><b>&gt; NEXT:</b> Hold, play, and take territory.</code></div><div class="features"><div class="feature"><strong>Pixel-native identity</strong><span>A crisp retro-future art direction built for the feed and the battlefield.</span></div><div class="feature"><strong>Community first</strong><span>Events, missions, and city milestones shaped with our holders.</span></div><div class="feature"><strong>Built to endure</strong><span>A straightforward token model designed for a long campaign.</span></div></div></div></div></section>
+      <section id="tokenomics"><div class="container"><div class="section-heading"><span class="eyebrow">Supply drop</span><h2>Tokenomics, decoded.</h2></div><div class="tokenomics"><div class="donut" aria-label="Token allocation chart"><div class="donut-inner"><b>$BCITY</b><span>10M SUPPLY</span></div></div><div class="allocation"><div><i class="dot"></i><span>Community campaign</span><b>40%</b></div><div><i class="dot"></i><span>Liquidity reserve</span><b>25%</b></div><div><i class="dot"></i><span>City development</span><b>20%</b></div><div><i class="dot"></i><span>Alliances & rewards</span><b>15%</b></div></div></div></div></section>
+      <section id="roadmap" class="about"><div class="container"><div class="section-heading"><span class="eyebrow">Operations map</span><h2>From spawn to stronghold.</h2></div><div class="roadmap"><article class="phase active"><h3>Phase 01 — Recruit</h3><p>Community channels open, first campaigns deployed, and the city map revealed.</p></article><article class="phase active"><h3>Phase 02 — Defend</h3><p>Token launch, creator missions, and the first community objectives.</p></article><article class="phase"><h3>Phase 03 — Expand</h3><p>Game modes, partner drops, and new districts unlocked with the community.</p></article><article class="phase"><h3>Phase 04 — Dominate</h3><p>Seasonal battles, rewards, and a city ecosystem built to keep growing.</p></article></div></div></section>
+      <section id="buy"><div class="container"><div class="section-heading"><span class="eyebrow">Field manual</span><h2>How to join the fight.</h2></div><div class="buy-grid"><article class="step"><div class="step-number">01</div><h3>Set up a wallet</h3><p>Use a compatible wallet and keep your recovery phrase offline.</p></article><article class="step"><div class="step-number">02</div><h3>Fund your wallet</h3><p>Send the network token you need for the transaction and fees.</p></article><article class="step"><div class="step-number">03</div><h3>Enter BattleCities</h3><p>Use the official launch link when it is announced. Always verify the source.</p></article></div></div></section>
+      <section><div class="container faq"><div class="section-heading"><span class="eyebrow">Radio check</span><h2>Frequently intercepted questions.</h2></div><details><summary>When does the campaign start?</summary><p>The launch schedule will be announced through BattleCities’ official community channels.</p></details><details><summary>Where can I find the official contract?</summary><p>The official contract address will only be posted on verified BattleCities channels. Never trust direct messages.</p></details><details><summary>Is this financial advice?</summary><p>No. This page is a project overview. Do your own research before making any decision involving digital assets.</p></details></div></section>
+      <section id="join" class="cta"><div class="container cta-grid"><div><span class="eyebrow">Ready signal detected</span><h2>Pick a side. Build a city. Make your mark.</h2></div><a class="button" href="mailto:hello@battlecities.example">Get mission updates ↗</a></div></section>
     </main>
+    <footer><div class="container footer-row"><a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>BattleCities</a><span>© 2026 BattleCities. Built for the next campaign.</span><div class="socials"><a href="#top" aria-label="BattleCities on X">X</a><a href="#top" aria-label="BattleCities on Discord">D</a><a href="#top" aria-label="BattleCities on Telegram">T</a></div></div></footer>
+    <script>
+      const menu = document.querySelector('.menu'); const links = document.querySelector('.links');
+      menu.addEventListener('click', () => { const open = links.classList.toggle('open'); menu.setAttribute('aria-expanded', open); menu.textContent = open ? '×' : '☰'; });
+      links.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => { links.classList.remove('open'); menu.setAttribute('aria-expanded', 'false'); menu.textContent = '☰'; }));
+    </script>
   </body>
 </html>
