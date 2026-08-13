@@ -29,6 +29,42 @@ async function updatePresence(){
 updatePresence();
 setInterval(updatePresence, 30000);
 
+// Authenticated website presence: visitors outside gameplay are online but not
+// in-game. The API session determines whether this heartbeat is accepted.
+const PRESENCE_ENDPOINT = 'https://api.battlecities.com/api/presence';
+const websitePresencePayload = JSON.stringify({ inGame: false, gameMode: null });
+
+async function sendWebsitePresence(){
+  try {
+    const response = await fetch(PRESENCE_ENDPOINT, {
+      method: 'POST',
+      credentials: 'include',
+      cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' },
+      body: websitePresencePayload,
+    });
+    // A visitor without an authenticated game/API session is expected to be rejected.
+    if (!response.ok && response.status !== 401) {
+      throw new Error(`Presence heartbeat failed: ${response.status}`);
+    }
+  } catch (error) {
+    console.warn('Unable to send website presence heartbeat.', error);
+  }
+}
+
+function clearWebsitePresence(){
+  // keepalive allows the request to complete while the page is closing.
+  fetch(PRESENCE_ENDPOINT, {
+    method: 'DELETE',
+    credentials: 'include',
+    keepalive: true,
+  }).catch(() => {});
+}
+
+sendWebsitePresence();
+setInterval(sendWebsitePresence, 30000);
+window.addEventListener('pagehide', clearWebsitePresence);
+
 // Token allocation breakdown used to render the allocation bars below
 const allocations = [
   { name: "Presale", pct: 40 },
