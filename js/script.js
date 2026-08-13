@@ -8,6 +8,27 @@ const PRESALE_RAISED = 340000;
 const PRESALE_TARGET = 500000;
 const progressPct = Math.round((PRESALE_RAISED / PRESALE_TARGET) * 100);
 
+// Public game presence: authenticated players send heartbeats in the game;
+// this website only reads the aggregate count and never sends credentials.
+async function updatePresence(){
+  const onlineCount = document.getElementById('online-count');
+  const inGameCount = document.getElementById('in-game-count');
+  if (!onlineCount || !inGameCount) return;
+  try {
+    const response = await fetch('https://api.battlecities.com/api/presence', { cache: 'no-store' });
+    if (!response.ok) throw new Error(`Presence request failed: ${response.status}`);
+    const presence = await response.json();
+    onlineCount.textContent = Number.isFinite(presence.online) ? presence.online : '--';
+    inGameCount.textContent = Number.isFinite(presence.inGame) ? presence.inGame : '--';
+  } catch (error) {
+    // Retain the last known values rather than making the navigation jump on a transient failure.
+    console.warn('Unable to update game presence.', error);
+  }
+}
+
+updatePresence();
+setInterval(updatePresence, 30000);
+
 // Token allocation breakdown used to render the allocation bars below
 const allocations = [
   { name: "Presale", pct: 40 },
