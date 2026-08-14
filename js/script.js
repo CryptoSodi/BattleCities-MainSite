@@ -128,7 +128,7 @@ document.getElementById('progress-pct').textContent = progressPct;
 
 // Fixed target timestamp so the countdown counts down to the same moment
 // for every visitor instead of resetting on every page load.
-const endDate = new Date('2026-07-11T00:00:00Z');
+const endDate = new Date('2026-09-13T00:00:00Z');
 function updateCountdown(){
   const now = new Date();
   let diff = Math.max(0, endDate - now);
