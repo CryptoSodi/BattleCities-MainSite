@@ -8,6 +8,26 @@ const PRESALE_RAISED = 340000;
 const PRESALE_TARGET = 500000;
 const progressPct = Math.round((PRESALE_RAISED / PRESALE_TARGET) * 100);
 
+// Reusable game/page handoff. Add data-deployment-url to any future route that
+// should show the elevator deployment sequence before navigation.
+function beginDeployment(event){
+  event.preventDefault();
+  const destination = event.currentTarget.dataset.deploymentUrl || event.currentTarget.href;
+  const overlay = document.getElementById('deploymentOverlay');
+  if (!overlay || !destination) {
+    window.location.assign(destination);
+    return;
+  }
+  overlay.setAttribute('aria-hidden', 'false');
+  overlay.classList.add('is-active');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.setTimeout(() => window.location.assign(destination), reducedMotion ? 0 : 1100);
+}
+
+document.querySelectorAll('[data-deployment-url]').forEach(link => {
+  link.addEventListener('click', beginDeployment);
+});
+
 // Public game presence: authenticated players send heartbeats in the game;
 // this website only reads the aggregate count and never sends credentials.
 async function updatePresence(){
