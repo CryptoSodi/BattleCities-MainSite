@@ -14,14 +14,17 @@ function beginDeployment(event){
   event.preventDefault();
   const destination = event.currentTarget.dataset.deploymentUrl || event.currentTarget.href;
   const overlay = document.getElementById('deploymentOverlay');
+  const sector = event.currentTarget.dataset.deploymentSector || '01';
+  const sectorLabel = document.getElementById('deploymentSector');
   if (!overlay || !destination) {
     window.location.assign(destination);
     return;
   }
+  sectorLabel.textContent = `SECTOR ${sector.padStart(2, '0')}`;
   overlay.setAttribute('aria-hidden', 'false');
   overlay.classList.add('is-active');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  window.setTimeout(() => window.location.assign(destination), reducedMotion ? 0 : 1100);
+  window.setTimeout(() => window.location.assign(destination), reducedMotion ? 0 : 1080);
 }
 
 document.querySelectorAll('[data-deployment-url]').forEach(link => {
