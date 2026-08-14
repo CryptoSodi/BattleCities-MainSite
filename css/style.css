@@ -437,7 +437,7 @@ section{position:relative;z-index:1;padding:70px 5% 90px;scroll-margin-top:var(-
   .stage .price{order:3;width:100%;margin-top:6px;}
 }
 .stage .tag{font-family:'Share Tech Mono';font-size:10px;letter-spacing:1px;padding:3px 8px;border:1px solid var(--neon-dim);color:var(--neon);text-transform:uppercase;display:flex;align-items:center;gap:5px;}
-.stage.done .tag{background:var(--neon);color:#000;border-color:var(--neon);}
+.stage.active .tag{background:var(--neon);color:#000;border-color:var(--neon);}
 .stage .price{color:var(--white);font-family:'Press Start 2P';font-size:11px;}
 .stage .status{color:var(--gray);font-size:11px;text-transform:uppercase;letter-spacing:1px;}
 

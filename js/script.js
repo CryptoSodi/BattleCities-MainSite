@@ -145,7 +145,7 @@ updateCountdown();
 setInterval(updateCountdown, 1000);
 
 // Conversion rates for the demo "Buy" widget: how many BATC per payment unit.
-const rates = { SOL: 83333, USDC: 555 };
+const rates = { SOL: 125000, USDC: 833 };
 
 // Quick-amount preset buttons shown under the "You Pay" field, per payment method
 const quickAmountPresets = {
@@ -179,7 +179,7 @@ function setMethod(method, el){
   document.querySelectorAll('.buy-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('payUnit').textContent = method;
-  document.getElementById('rateText').textContent = method === 'SOL' ? '1 SOL = 83,333 BATC' : '1 USDC = 555 BATC';
+  document.getElementById('rateText').textContent = method === 'SOL' ? '1 SOL = 125,000 BATC' : '1 USDC = 833 BATC';
   renderQuickAmounts();
   calc();
 }

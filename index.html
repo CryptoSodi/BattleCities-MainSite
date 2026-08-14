@@ -68,7 +68,7 @@
       </div>
       <!-- Quick-glance stats row -->
       <div class="hero-stats">
-        <div><div class="num"><svg data-lucide="trending-up" class="icon"></svg><span class="text-white">$0.0018</span></div><div class="lbl">Current Price</div></div>
+        <div><div class="num"><svg data-lucide="trending-up" class="icon"></svg><span class="text-white">$0.0012</span></div><div class="lbl">Current Price</div></div>
         <div><div class="num"><svg data-lucide="coins" class="icon"></svg><span class="text-white">1B</span></div><div class="lbl">Total Supply</div></div>
         <div><div class="num"><svg data-lucide="flame" class="icon"></svg><span class="text-white">68%</span></div><div class="lbl">Presale Sold</div></div>
         <div><div class="num"><svg data-lucide="shield-alert" class="icon"></svg><span class="text-white">SOLANA</span></div><div class="lbl">Network</div></div>
@@ -152,7 +152,7 @@
       <div class="tl-dot"></div>
       <div class="tl-marker mono">Q3 2026</div>
       <div class="tl-body">
-        <h3><svg data-lucide="flame" class="icon"></svg>Presale — Stage 2 (Now)</h3>
+        <h3><svg data-lucide="flame" class="icon"></svg>Presale — Stage 1 (Now)</h3>
         <p>Public presale in progress. Price rises each stage until the DEX listing.</p>
       </div>
     </div>
@@ -179,7 +179,7 @@
 <!-- Numbers below (cd-d / cd-h / cd-m / cd-s) are updated every second by script.js -->
 <section class="countdown-section" id="countdown-section">
   <div class="cds-inner">
-    <div class="sec-tag center"><svg data-lucide="timer" class="icon"></svg>Don't Miss Stage 2</div>
+    <div class="sec-tag center"><svg data-lucide="timer" class="icon"></svg>Don't Miss Stage 1</div>
     <h2 class="cds-title">Presale Ends In</h2>
     <div class="clock mono cds-clock" id="countdown">
       <div class="box"><div class="n" id="cd-d">00</div><div class="u">Days</div></div>
@@ -190,7 +190,7 @@
       <span class="cds-colon">:</span>
       <div class="box highlight"><div class="n" id="cd-s">00</div><div class="u">Seconds</div></div>
     </div>
-    <p class="cds-note"><svg data-lucide="triangle-alert" class="icon"></svg>Price rises to Stage 3 once the timer hits zero.</p>
+    <p class="cds-note"><svg data-lucide="triangle-alert" class="icon"></svg>Price rises to Stage 2 once the timer hits zero.</p>
   </div>
 </section>
 
@@ -221,15 +221,15 @@
           </div>
 
           <div class="stage-list">
-            <div class="stage done">
-              <span class="tag"><svg data-lucide="check" class="icon"></svg>Completed</span>
-              <span class="price">STAGE 1 — $0.0012</span>
-              <span class="status">Sold Out</span>
-            </div>
-            <div class="stage done">
+            <div class="stage active">
               <span class="tag"><svg data-lucide="flame" class="icon"></svg>Active</span>
-              <span class="price">STAGE 2 — $0.0018</span>
+              <span class="price">STAGE 1 — $0.0012</span>
               <span class="status" style="color:var(--neon);">Ongoing</span>
+            </div>
+            <div class="stage">
+              <span class="tag"><svg data-lucide="lock" class="icon"></svg>Upcoming</span>
+              <span class="price">STAGE 2 — $0.0018</span>
+              <span class="status">Locked</span>
             </div>
             <div class="stage">
               <span class="tag"><svg data-lucide="lock" class="icon"></svg>Upcoming</span>
@@ -276,8 +276,8 @@
           </div>
         </div>
 
-        <div class="rate-line"><span>Current Rate</span><span id="rateText">1 SOL = 83,333 BATC</span></div>
-        <div class="rate-line"><span>Price per Token</span><span>$0.0018</span></div>
+        <div class="rate-line"><span>Current Rate</span><span id="rateText">1 SOL = 125,000 BATC</span></div>
+        <div class="rate-line"><span>Price per Token</span><span>$0.0012</span></div>
 
         <!-- Static demo only: connectWallet() just shows an explanatory alert -->
         <button class="btn btn-primary buy-btn" onclick="connectWallet()"><svg data-lucide="wallet" class="icon"></svg>Connect Wallet & Buy</button>
@@ -329,7 +329,7 @@
         <span class="faq-q"><svg data-lucide="layers" class="icon q-icon"></svg>How does the presale work?</span>
         <svg data-lucide="chevron-down" class="icon chev"></svg>
       </summary>
-      <div class="faq-answer">The presale runs in fixed-price stages. Stage 1 already sold out at $0.0012, Stage 2 is live now at $0.0018, and price steps up again at Stage 3. Once a stage sells out — or the countdown timer hits zero — the price moves to the next stage and doesn't come back down.</div>
+      <div class="faq-answer">The presale runs in fixed-price stages. Stage 1 is live now at $0.0012, Stage 2 follows at $0.0018, and the price steps up again at Stage 3. Once a stage sells out — or the countdown timer hits zero — the price moves to the next stage and doesn't come back down.</div>
     </details>
 
     <details class="faq-item" name="faq-group">
