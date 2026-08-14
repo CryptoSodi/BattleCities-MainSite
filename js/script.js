@@ -1,5 +1,5 @@
 /* =========================================================
-   NEKOPIXEL // BEP-20 LAUNCHPAD — SCRIPT
+   BATTLE CITIES // SOLANA TOKEN SITE — SCRIPT
    ========================================================= */
 
 // Presale numbers driven from one source so the progress bar, % text,
@@ -144,15 +144,15 @@ function updateCountdown(){
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
-// Conversion rates for the "Buy" widget: how many NEKO per 1 unit of the selected currency
-const rates = { BNB: 333333, USDT: 555 };
+// Conversion rates for the demo "Buy" widget: how many BATC per payment unit.
+const rates = { SOL: 83333, USDC: 555 };
 
 // Quick-amount preset buttons shown under the "You Pay" field, per payment method
 const quickAmountPresets = {
-  BNB:  [{ label: '0.5 BNB', value: 0.5 }, { label: '1 BNB', value: 1 }, { label: 'MAX', value: 3.25 }],
-  USDT: [{ label: '100 USDT', value: 100 }, { label: '250 USDT', value: 250 }, { label: 'MAX', value: 1800 }],
+  SOL:  [{ label: '0.5 SOL', value: 0.5 }, { label: '1 SOL', value: 1 }, { label: 'MAX', value: 3.25 }],
+  USDC: [{ label: '100 USDC', value: 100 }, { label: '250 USDC', value: 250 }, { label: 'MAX', value: 1800 }],
 };
-let currentMethod = 'BNB';
+let currentMethod = 'SOL';
 
 // Render the quick-amount buttons for the currently selected payment method
 function renderQuickAmounts(){
@@ -173,13 +173,13 @@ function renderQuickAmounts(){
   });
 }
 
-// Switch between BNB / USDT as the payment method (called from the buy-tab onclick)
+// Switch between SOL / USDC as the payment method (called from the buy-tab onclick)
 function setMethod(method, el){
   currentMethod = method;
   document.querySelectorAll('.buy-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('payUnit').textContent = method;
-  document.getElementById('rateText').textContent = method === 'BNB' ? '1 BNB = 333,333 NEKO' : '1 USDT = 555 NEKO';
+  document.getElementById('rateText').textContent = method === 'SOL' ? '1 SOL = 83,333 BATC' : '1 USDC = 555 BATC';
   renderQuickAmounts();
   calc();
 }
