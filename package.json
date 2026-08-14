@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@cherrydotfun/chat-embed-sdk": "0.1.6"
+  }
+}

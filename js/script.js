@@ -367,3 +367,162 @@ document.querySelectorAll('.faq-item').forEach(item => {
     }
   });
 });
+
+// Cherry community chat. The app secret never reaches this client: the
+// authenticated BattleCities API mints a wallet-bound, five-minute token.
+const CHERRY_APP_ID = '148185d2-9181-4e2f-9e4d-47e5b5c12f2a';
+const CHERRY_ROOM_ID = 'ffd51288-710c-4558-83dc-d5fe9b04451d';
+const CHERRY_EMBED_URL = 'https://embed.cherry.fun';
+const CHERRY_TOKEN_ENDPOINT = 'https://api.battlecities.com/api/cherry-embed-token';
+
+let cherryChat = null;
+let cherryWalletProvider = null;
+let cherryWalletAddress = '';
+let cherryChatVisible = false;
+let cherryChatReady = false;
+
+function setCherryStatus(message = '', isError = false, retry = null){
+  const status = document.getElementById('cherryChatStatus');
+  const text = document.getElementById('cherryChatStatusText');
+  const retryButton = document.getElementById('cherryChatRetry');
+  if (!status || !text || !retryButton) return;
+
+  status.hidden = message === '';
+  status.classList.toggle('is-error', isError);
+  text.textContent = message;
+  retryButton.hidden = typeof retry !== 'function';
+  retryButton.onclick = typeof retry === 'function' ? retry : null;
+}
+
+function getCherryWalletProvider(){
+  return window.phantom?.solana || (window.solana?.isPhantom ? window.solana : null);
+}
+
+async function requestCherryToken(walletAddress){
+  const response = await fetch(CHERRY_TOKEN_ENDPOINT, {
+    method: 'POST',
+    credentials: 'include',
+    cache: 'no-store',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ walletAddress }),
+  });
+
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || typeof result.token !== 'string') {
+    if (response.status === 401) throw new Error('Sign in to Battle Cities before joining chat.');
+    if (response.status === 403) throw new Error('Use the same Solana wallet linked to your Battle Cities account.');
+    throw new Error(result.error || 'Chat authentication is unavailable. Try again shortly.');
+  }
+  return result.token;
+}
+
+async function connectCherryWallet(){
+  const provider = getCherryWalletProvider();
+  if (!provider) {
+    throw new Error('Install or open Phantom to join the chat.');
+  }
+
+  setCherryStatus('CONNECTING WALLET // STAND BY');
+  const connection = await provider.connect();
+  const walletAddress = connection?.publicKey?.toString() || provider.publicKey?.toString();
+  if (!walletAddress) throw new Error('The wallet did not return an address.');
+
+  const token = await requestCherryToken(walletAddress);
+  cherryWalletProvider = provider;
+  cherryWalletAddress = walletAddress;
+  cherryChat.setToken(token);
+  cherryChat.setWalletAddress(walletAddress);
+  setCherryStatus('');
+}
+
+async function signCherryChallenge(message){
+  if (!cherryWalletProvider || !cherryWalletAddress) {
+    throw new Error('Connect your wallet before signing the chat challenge.');
+  }
+  const signed = await cherryWalletProvider.signMessage(message, 'utf8');
+  return signed?.signature || signed;
+}
+
+async function handleCherryWalletRequest(){
+  try {
+    await connectCherryWallet();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unable to connect chat.';
+    setCherryStatus(message, true, handleCherryWalletRequest);
+  }
+}
+
+async function initializeCherryChat(){
+  const launcher = document.getElementById('cherryChatLauncher');
+  if (!launcher || cherryChatReady) return;
+
+  launcher.disabled = true;
+  launcher.setAttribute('aria-busy', 'true');
+  setCherryStatus('LOADING COMMUNITY CHANNEL');
+
+  try {
+    const CherryEmbed = window.CherryEmbedSDK?.CherryEmbed;
+    if (typeof CherryEmbed !== 'function') throw new Error('Chat service failed to load.');
+
+    cherryChat = new CherryEmbed({
+      appId: CHERRY_APP_ID,
+      embedUrl: CHERRY_EMBED_URL,
+      roomId: CHERRY_ROOM_ID,
+      mode: 'single',
+      position: 'floating-right',
+      collapsed: false,
+      theme: {
+        mode: 'dark',
+        primaryColor: '#FFB30F',
+        backgroundColor: '#06090B',
+      },
+      signChallengeHandler: signCherryChallenge,
+    });
+
+    cherryChat.on('walletConnectRequested', handleCherryWalletRequest);
+    cherryChat.on('authStateChange', (authenticated) => {
+      launcher.classList.toggle('is-authenticated', authenticated === true);
+      launcher.setAttribute(
+        'aria-label',
+        authenticated ? 'Toggle authenticated Battle Cities community chat' : 'Toggle Battle Cities community chat',
+      );
+    });
+
+    await cherryChat.mount();
+    // The portal configuration stays `collapsed: false`; hide once after the
+    // SDK is ready so the site initially presents the requested chat bubble.
+    cherryChat.hide();
+    cherryChatReady = true;
+    launcher.disabled = false;
+    launcher.setAttribute('aria-busy', 'false');
+    launcher.classList.add('is-ready');
+    setCherryStatus('');
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unable to load community chat.';
+    launcher.disabled = false;
+    launcher.setAttribute('aria-busy', 'false');
+    setCherryStatus(message, true, initializeCherryChat);
+  }
+}
+
+document.getElementById('cherryChatLauncher')?.addEventListener('click', async () => {
+  const launcher = document.getElementById('cherryChatLauncher');
+  if (!cherryChatReady) {
+    await initializeCherryChat();
+    return;
+  }
+  cherryChat.toggle();
+  cherryChatVisible = !cherryChatVisible;
+  launcher?.setAttribute('aria-expanded', String(cherryChatVisible));
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape' || !cherryChatReady || !cherryChatVisible) return;
+  cherryChat.hide();
+  cherryChatVisible = false;
+  const launcher = document.getElementById('cherryChatLauncher');
+  launcher?.setAttribute('aria-expanded', 'false');
+  launcher?.focus();
+});
+
+window.addEventListener('load', initializeCherryChat, { once: true });

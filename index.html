@@ -9,6 +9,7 @@
 <link rel="icon" href="images/b32a5492-7a0a-4de4-ada6-c3d66a81c4dd.png" type="image/png">
 <!-- External libraries: icon set + smooth-scroll -->
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
+<script src="js/vendor/cherry-embed-sdk-0.1.6.js" defer></script>
 <script src="js/vendor/gsap.min.js" defer></script>
 <script src="js/vendor/ScrollTrigger.min.js" defer></script>
 <!-- Page styles, moved out into its own file -->
@@ -371,6 +372,28 @@
     <div class="mono">© 2026 $BATC — BUILT ON SOLANA</div>
   </div>
 </footer>
+
+<!-- Cherry community chat: the SDK owns the floating panel; this button is
+     the site-native launcher Cherry intentionally leaves to the host app. -->
+<div class="cherry-chat-controls" id="cherryChatControls">
+  <div class="cherry-chat-status" id="cherryChatStatus" role="status" aria-live="polite" hidden>
+    <span id="cherryChatStatusText"></span>
+    <button type="button" id="cherryChatRetry" hidden>Retry</button>
+  </div>
+  <button
+    type="button"
+    class="cherry-chat-launcher"
+    id="cherryChatLauncher"
+    aria-label="Toggle Battle Cities community chat"
+    aria-expanded="false"
+    aria-busy="true"
+    disabled
+  >
+    <svg data-lucide="message-circle" aria-hidden="true"></svg>
+    <span>BATTLE CHAT</span>
+    <i class="cherry-chat-led" aria-hidden="true"></i>
+  </button>
+</div>
 
 <!-- Deployment transition reused before opening the game or any future page route. -->
 <div class="deployment-overlay" id="deploymentOverlay" aria-hidden="true">
