@@ -573,7 +573,10 @@ async function initializeCherryChat(){
       roomId: CHERRY_ROOM_ID,
       mode: 'single',
       position: 'floating-right',
-      collapsed: false,
+      // Cherry applies this state synchronously as it creates the iframe. It
+      // prevents the panel from painting during SDK startup; `show()` runs
+      // only after the visitor presses the site-native chat button.
+      collapsed: true,
       theme: {
         mode: 'dark',
         primaryColor: '#FFB30F',
@@ -592,8 +595,7 @@ async function initializeCherryChat(){
     });
 
     await cherryChat.mount();
-    // The portal configuration stays `collapsed: false`; hide once after the
-    // SDK is ready so the site initially presents the requested chat bubble.
+    // Keep the embedded panel closed until the visitor explicitly opens it.
     cherryChat.hide();
     // Cherry uses the maximum z-index; moving host controls to the end keeps
     // the close button above the iframe when the full panel is open.
