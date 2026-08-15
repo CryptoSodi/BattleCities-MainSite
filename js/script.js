@@ -381,6 +381,18 @@ let cherryWalletAddress = '';
 let cherryChatVisible = false;
 let cherryChatReady = false;
 
+function setCherryChatVisibility(visible, moveFocus = true){
+  const controls = document.getElementById('cherryChatControls');
+  const launcher = document.getElementById('cherryChatLauncher');
+  const closeButton = document.getElementById('cherryChatClose');
+  cherryChatVisible = visible;
+  controls?.classList.toggle('is-open', visible);
+  launcher?.setAttribute('aria-expanded', String(visible));
+  if (launcher) launcher.hidden = visible;
+  if (closeButton) closeButton.hidden = !visible;
+  if (moveFocus) (visible ? closeButton : launcher)?.focus();
+}
+
 function setCherryStatus(message = '', isError = false, retry = null){
   const status = document.getElementById('cherryChatStatus');
   const text = document.getElementById('cherryChatStatusText');
@@ -492,6 +504,10 @@ async function initializeCherryChat(){
     // The portal configuration stays `collapsed: false`; hide once after the
     // SDK is ready so the site initially presents the requested chat bubble.
     cherryChat.hide();
+    // Cherry uses the maximum z-index; moving host controls to the end keeps
+    // the close button above the iframe when the full panel is open.
+    document.body.appendChild(document.getElementById('cherryChatControls'));
+    setCherryChatVisibility(false, false);
     cherryChatReady = true;
     launcher.disabled = false;
     launcher.setAttribute('aria-busy', 'false');
@@ -506,23 +522,24 @@ async function initializeCherryChat(){
 }
 
 document.getElementById('cherryChatLauncher')?.addEventListener('click', async () => {
-  const launcher = document.getElementById('cherryChatLauncher');
   if (!cherryChatReady) {
     await initializeCherryChat();
     return;
   }
-  cherryChat.toggle();
-  cherryChatVisible = !cherryChatVisible;
-  launcher?.setAttribute('aria-expanded', String(cherryChatVisible));
+  cherryChat.show();
+  setCherryChatVisibility(true);
+});
+
+document.getElementById('cherryChatClose')?.addEventListener('click', () => {
+  if (!cherryChatReady) return;
+  cherryChat.hide();
+  setCherryChatVisibility(false);
 });
 
 document.addEventListener('keydown', (event) => {
   if (event.key !== 'Escape' || !cherryChatReady || !cherryChatVisible) return;
   cherryChat.hide();
-  cherryChatVisible = false;
-  const launcher = document.getElementById('cherryChatLauncher');
-  launcher?.setAttribute('aria-expanded', 'false');
-  launcher?.focus();
+  setCherryChatVisibility(false);
 });
 
 window.addEventListener('load', initializeCherryChat, { once: true });
