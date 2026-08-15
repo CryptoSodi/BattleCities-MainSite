@@ -373,6 +373,7 @@ document.querySelectorAll('.faq-item').forEach(item => {
 const CHERRY_APP_ID = '148185d2-9181-4e2f-9e4d-47e5b5c12f2a';
 const CHERRY_ROOM_ID = 'ffd51288-710c-4558-83dc-d5fe9b04451d';
 const CHERRY_EMBED_URL = 'https://embed.cherry.fun';
+const CHERRY_SESSION_ENDPOINT = 'https://api.battlecities.com/api/session';
 const CHERRY_TOKEN_ENDPOINT = 'https://api.battlecities.com/api/cherry-embed-token';
 
 let cherryChat = null;
@@ -410,6 +411,59 @@ function getCherryWalletProvider(){
   return window.phantom?.solana || (window.solana?.isPhantom ? window.solana : null);
 }
 
+function cherrySignatureToBase64(signature){
+  let binary = '';
+  signature.forEach(byte => {
+    binary += String.fromCharCode(byte);
+  });
+  return window.btoa(binary);
+}
+
+async function authenticateCherryWallet(provider, walletAddress){
+  const challengeResponse = await fetch(CHERRY_SESSION_ENDPOINT, {
+    method: 'PUT',
+    credentials: 'include',
+    cache: 'no-store',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ walletAddress }),
+  });
+  const challenge = await challengeResponse.json().catch(() => ({}));
+  if (
+    !challengeResponse.ok ||
+    typeof challenge.nonce !== 'string' ||
+    typeof challenge.message !== 'string'
+  ) {
+    throw new Error(challenge.error || 'Could not create the Battle Cities wallet challenge.');
+  }
+
+  const signed = await provider.signMessage(
+    new TextEncoder().encode(challenge.message),
+    'utf8',
+  );
+  const signature = signed instanceof Uint8Array ? signed : signed?.signature;
+  if (!(signature instanceof Uint8Array) || signature.length !== 64) {
+    throw new Error('Phantom returned an invalid signature.');
+  }
+
+  const sessionResponse = await fetch(CHERRY_SESSION_ENDPOINT, {
+    method: 'POST',
+    credentials: 'include',
+    cache: 'no-store',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      provider: 'wallet',
+      walletAddress,
+      nonce: challenge.nonce,
+      message: challenge.message,
+      signature: cherrySignatureToBase64(signature),
+    }),
+  });
+  const session = await sessionResponse.json().catch(() => ({}));
+  if (!sessionResponse.ok) {
+    throw new Error(session.error || 'Could not authenticate the Battle Cities wallet session.');
+  }
+}
+
 async function requestCherryToken(walletAddress){
   const response = await fetch(CHERRY_TOKEN_ENDPOINT, {
     method: 'POST',
@@ -439,6 +493,7 @@ async function connectCherryWallet(){
   const walletAddress = connection?.publicKey?.toString() || provider.publicKey?.toString();
   if (!walletAddress) throw new Error('The wallet did not return an address.');
 
+  await authenticateCherryWallet(provider, walletAddress);
   const token = await requestCherryToken(walletAddress);
   cherryWalletProvider = provider;
   cherryWalletAddress = walletAddress;
