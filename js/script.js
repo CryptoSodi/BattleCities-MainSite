@@ -8,10 +8,32 @@ const PRESALE_RAISED = 340000;
 const PRESALE_TARGET = 500000;
 const progressPct = Math.round((PRESALE_RAISED / PRESALE_TARGET) * 100);
 
+// DEPLOYMENT HANDOFF STORYBOARD
+// 0ms    reset any cached animation state
+// 0ms    close the doors and reveal the deployment overlay
+// 1080ms arrive at the requested game or site route
+const DEPLOYMENT_TIMING = {
+  handoff: 1080,
+};
+
+let deploymentInProgress = false;
+let deploymentTimer = null;
+
+function resetDeployment(){
+  const overlay = document.getElementById('deploymentOverlay');
+  if (deploymentTimer) window.clearTimeout(deploymentTimer);
+  deploymentTimer = null;
+  deploymentInProgress = false;
+  if (!overlay) return;
+  overlay.classList.remove('is-active');
+  overlay.setAttribute('aria-hidden', 'true');
+}
+
 // Reusable game/page handoff. Add data-deployment-url to any future route that
 // should show the elevator deployment sequence before navigation.
 function beginDeployment(event){
   event.preventDefault();
+  if (deploymentInProgress) return;
   const destination = event.currentTarget.dataset.deploymentUrl || event.currentTarget.href;
   const overlay = document.getElementById('deploymentOverlay');
   const sector = event.currentTarget.dataset.deploymentSector || '01';
@@ -21,15 +43,29 @@ function beginDeployment(event){
     return;
   }
   sectorLabel.textContent = `SECTOR ${sector.padStart(2, '0')}`;
+  deploymentInProgress = true;
   overlay.setAttribute('aria-hidden', 'false');
+
+  // The site can return from the game through the browser's back-forward
+  // cache. Removing the class and forcing one layout read resets every CSS
+  // keyframe so the same transition plays on every Play click.
+  overlay.classList.remove('is-active');
+  void overlay.offsetWidth;
   overlay.classList.add('is-active');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  window.setTimeout(() => window.location.assign(destination), reducedMotion ? 0 : 1080);
+  deploymentTimer = window.setTimeout(
+    () => window.location.assign(destination),
+    reducedMotion ? 0 : DEPLOYMENT_TIMING.handoff
+  );
 }
 
 document.querySelectorAll('[data-deployment-url]').forEach(link => {
   link.addEventListener('click', beginDeployment);
 });
+
+// pageshow also fires when restoring this page from bfcache after the user
+// returns from the game. The animation must be idle before its next replay.
+window.addEventListener('pageshow', resetDeployment);
 
 // Public game presence: authenticated players send heartbeats in the game;
 // this website only reads the aggregate count and never sends credentials.
