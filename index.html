@@ -78,9 +78,9 @@
       </a>
       <!-- Quick-glance stats row -->
       <div class="hero-stats">
-        <div><div class="num"><svg data-lucide="trending-up" class="icon"></svg><span class="text-white">$0.0012</span></div><div class="lbl">Current Price</div></div>
+        <div><div class="num"><svg data-lucide="trending-up" class="icon"></svg><span class="text-white">$0.005</span></div><div class="lbl">Current Price</div></div>
         <div><div class="num"><svg data-lucide="coins" class="icon"></svg><span class="text-white">1B</span></div><div class="lbl">Total Supply</div></div>
-        <div><div class="num"><svg data-lucide="flame" class="icon"></svg><span class="text-white">68%</span></div><div class="lbl">Presale Sold</div></div>
+        <div><div class="num"><svg data-lucide="flame" class="icon"></svg><span class="text-white">40%</span></div><div class="lbl">Presale Sold</div></div>
         <div><div class="num"><svg data-lucide="shield-alert" class="icon"></svg><span class="text-white">SOLANA</span></div><div class="lbl">Network</div></div>
       </div>
     </div>
@@ -135,7 +135,7 @@
       <div class="risk-box pixel-frame danger reveal">
         <div class="pixel-frame-inner risk-inner">
           <svg data-lucide="triangle-alert" class="icon-lg"></svg>
-          <p><b>HIGH RISK ZONE.</b> Team & Advisor allocations are locked to prevent sudden dumps, but crypto assets remain highly volatile. Always do your own research (DYOR) before buying.</p>
+          <p><b>PRIVATE PRESALE ACCESS.</b> Join the private presale before the public sale begins&mdash;public-sale pricing will be higher. Review the token details and risks before participating.</p>
         </div>
       </div>
     </div>
@@ -221,35 +221,39 @@
         <div class="pixel-frame-inner terminal-body">
           <div class="progress-top">
             <!-- raised-amount / goal-amount are static text; progress bar segments + % are built by script.js -->
-            <div><span class="raised" id="raised-amount">340,000</span> <span class="mono" style="color:var(--gray);font-size:13px;">USDC raised</span></div>
-            <div class="goal mono">Target: <span id="goal-amount">500,000</span> USDC</div>
+            <div><span class="raised" id="raised-amount">1,000</span> <span class="mono" style="color:var(--gray);font-size:13px;">USDC raised</span></div>
+            <div class="goal mono">Target: <span id="goal-amount">3,025</span> USDC</div>
           </div>
           <div class="progress-track" id="progress-track"></div>
           <div class="progress-meta">
-            <span><svg data-lucide="trending-up" class="icon"></svg> <span id="progress-pct">68</span>% Reached</span>
+            <span><svg data-lucide="trending-up" class="icon"></svg> <span id="progress-pct">33</span>% Reached</span>
             <span class="accent"><svg data-lucide="users" class="icon"></svg> 4,120 Participants</span>
           </div>
 
-          <div class="stage-list">
+          <div class="stage-list" aria-label="Presale stages">
+            <div class="stage stage-head" aria-hidden="true">
+              <span>Stage</span><span>Price</span><span>BATC Sold</span><span>Raised</span>
+            </div>
             <div class="stage active">
-              <span class="tag"><svg data-lucide="flame" class="icon"></svg>Active</span>
-              <span class="price">STAGE 1 — $0.0012</span>
-              <span class="status" style="color:var(--neon);">Ongoing</span>
+              <span class="tag"><svg data-lucide="flame" class="icon"></svg>Stage 1</span>
+              <span class="price">$0.005</span>
+              <span class="stage-value">200,000</span>
+              <span class="stage-value">$1,000</span>
             </div>
             <div class="stage">
-              <span class="tag"><svg data-lucide="lock" class="icon"></svg>Upcoming</span>
-              <span class="price">STAGE 2 — $0.0018</span>
-              <span class="status">Locked</span>
+              <span class="tag"><svg data-lucide="lock" class="icon"></svg>Stage 2</span>
+              <span class="price">$0.006</span>
+              <span class="stage-value">150,000</span>
+              <span class="stage-value">$900</span>
             </div>
             <div class="stage">
-              <span class="tag"><svg data-lucide="lock" class="icon"></svg>Upcoming</span>
-              <span class="price">STAGE 3 — $0.0025</span>
-              <span class="status">Locked</span>
+              <span class="tag"><svg data-lucide="lock" class="icon"></svg>Stage 3</span>
+              <span class="price">$0.0075</span>
+              <span class="stage-value">150,000</span>
+              <span class="stage-value">$1,125</span>
             </div>
-            <div class="stage">
-              <span class="tag"><svg data-lucide="lock" class="icon"></svg>Listing</span>
-              <span class="price">DEX — $0.0040</span>
-              <span class="status">Locked</span>
+            <div class="stage stage-total">
+              <span>Total</span><span></span><span>500,000</span><span>$3,025</span>
             </div>
           </div>
 
@@ -286,8 +290,8 @@
           </div>
         </div>
 
-        <div class="rate-line"><span>Current Rate</span><span id="rateText">1 SOL = 125,000 BATC</span></div>
-        <div class="rate-line"><span>Price per Token</span><span>$0.0012</span></div>
+        <div class="rate-line"><span>Current Rate</span><span id="rateText">1 SOL = 30,000 BATC</span></div>
+        <div class="rate-line"><span>Price per Token</span><span>$0.005</span></div>
 
         <!-- Static demo only: connectWallet() just shows an explanatory alert -->
         <button class="btn btn-primary buy-btn" onclick="connectWallet()"><svg data-lucide="wallet" class="icon"></svg>Connect Wallet & Buy</button>
@@ -339,7 +343,7 @@
         <span class="faq-q"><svg data-lucide="layers" class="icon q-icon"></svg>How does the presale work?</span>
         <svg data-lucide="chevron-down" class="icon chev"></svg>
       </summary>
-      <div class="faq-answer">The presale runs in fixed-price stages. Stage 1 is live now at $0.0012, Stage 2 follows at $0.0018, and the price steps up again at Stage 3. Once a stage sells out — or the countdown timer hits zero — the price moves to the next stage and doesn't come back down.</div>
+      <div class="faq-answer">The presale runs in fixed-price stages. Stage 1 is live now at $0.005, Stage 2 follows at $0.006, and Stage 3 is priced at $0.0075. Once a stage sells out — or the countdown timer hits zero — the price moves to the next stage and doesn't come back down.</div>
     </details>
 
     <details class="faq-item" name="faq-group">

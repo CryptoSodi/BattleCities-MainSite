@@ -4,8 +4,8 @@
 
 // Presale numbers driven from one source so the progress bar, % text,
 // and the rest of the JS never drift out of sync with each other.
-const PRESALE_RAISED = 340000;
-const PRESALE_TARGET = 500000;
+const PRESALE_RAISED = 1000;
+const PRESALE_TARGET = 3025;
 const progressPct = Math.round((PRESALE_RAISED / PRESALE_TARGET) * 100);
 
 // DEPLOYMENT HANDOFF STORYBOARD
@@ -182,7 +182,7 @@ updateCountdown();
 setInterval(updateCountdown, 1000);
 
 // Conversion rates for the demo "Buy" widget: how many BATC per payment unit.
-const rates = { SOL: 125000, USDC: 833 };
+const rates = { SOL: 30000, USDC: 200 };
 
 // Quick-amount preset buttons shown under the "You Pay" field, per payment method
 const quickAmountPresets = {
@@ -216,7 +216,7 @@ function setMethod(method, el){
   document.querySelectorAll('.buy-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('payUnit').textContent = method;
-  document.getElementById('rateText').textContent = method === 'SOL' ? '1 SOL = 125,000 BATC' : '1 USDC = 833 BATC';
+  document.getElementById('rateText').textContent = method === 'SOL' ? '1 SOL = 30,000 BATC' : '1 USDC = 200 BATC';
   renderQuickAmounts();
   calc();
 }
