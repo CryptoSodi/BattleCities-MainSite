@@ -2,11 +2,11 @@
    BATTLE CITIES // SOLANA TOKEN SITE — SCRIPT
    ========================================================= */
 
-// Presale numbers driven from one source so the progress bar, % text,
-// and the rest of the JS never drift out of sync with each other.
-const PRESALE_RAISED = 1000;
-const PRESALE_TARGET = 3025;
-const progressPct = Math.round((PRESALE_RAISED / PRESALE_TARGET) * 100);
+// Presale figures are loaded from the backend. Confirmed Solana transactions,
+// rather than browser constants, are the source of truth.
+const PRESALE_API_BASE = document.querySelector('meta[name="presale-api-base"]')?.content?.replace(/\/$/, '') || '';
+let presaleState = null;
+let presaleRefreshTimer = null;
 
 // DEPLOYMENT HANDOFF STORYBOARD
 // 0ms    reset any cached animation state
@@ -153,19 +153,25 @@ requestAnimationFrame(() => {
   });
 });
 
-// Build the segmented presale progress bar (40 segments, lit up proportionally to progressPct)
+// Build the segmented presale progress bar and update its lit segments in place.
 const track = document.getElementById('progress-track');
-const totalSeg = 40, onSeg = Math.round(totalSeg * (progressPct / 100));
+const totalSeg = 40;
 for(let i=0;i<totalSeg;i++){
   const s = document.createElement('div');
-  s.className = 'seg' + (i < onSeg ? ' on' : '');
+  s.className = 'seg';
   track.appendChild(s);
 }
-document.getElementById('progress-pct').textContent = progressPct;
+
+function renderProgress(percent){
+  const safePercent = Math.max(0, Math.min(100, Number(percent) || 0));
+  const onSeg = Math.round(totalSeg * safePercent / 100);
+  [...track.children].forEach((segment, index) => segment.classList.toggle('on', index < onSeg));
+  document.getElementById('progress-pct').textContent = String(Math.round(safePercent));
+}
 
 // Fixed target timestamp so the countdown counts down to the same moment
 // for every visitor instead of resetting on every page load.
-const endDate = new Date('2026-09-13T00:00:00Z');
+let endDate = new Date('2026-09-13T00:00:00Z');
 function updateCountdown(){
   const now = new Date();
   let diff = Math.max(0, endDate - now);
@@ -181,17 +187,149 @@ function updateCountdown(){
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
-// Conversion rates for the demo "Buy" widget: how many BATC per payment unit.
-const rates = { SOL: 30000, USDC: 200 };
-
-// Quick-amount preset buttons shown under the "You Pay" field, per payment method
-const quickAmountPresets = {
-  SOL:  [{ label: '0.5 SOL', value: 0.5 }, { label: '1 SOL', value: 1 }, { label: 'MAX', value: 3.25 }],
-  USDC: [{ label: '100 USDC', value: 100 }, { label: '250 USDC', value: 250 }, { label: 'MAX', value: 1800 }],
-};
 let currentMethod = 'SOL';
+let phantomProvider = null;
+let connectedWallet = null;
+let pendingQuote = null;
 
-// Render the quick-amount buttons for the currently selected payment method
+const quickAmountPresets = {
+  SOL: [{ label: '0.5 SOL', value: 0.5 }, { label: '1 SOL', value: 1 }, { label: 'MAX', value: 'max' }],
+  USDC: [{ label: '100 USDC', value: 100 }, { label: '250 USDC', value: 250 }],
+};
+
+function safeNumber(value){
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function formatFiat(value){
+  const number = safeNumber(value);
+  if (number === null) return '--';
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Object.is(number, -0) ? 0 : number);
+}
+
+function formatTokenAmount(value, detailed = false){
+  const number = safeNumber(value);
+  if (number === null) return '--';
+  if (number === 0) return '0';
+  return new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: detailed ? 6 : 2,
+    notation: !detailed && Math.abs(number) >= 1000000 ? 'compact' : 'standard',
+  }).format(number);
+}
+
+function formatTokenPrice(value){
+  const number = safeNumber(value);
+  if (number === null) return '--';
+  if (number === 0) return '$0.00';
+  return `$${number.toLocaleString('en-US', { maximumFractionDigits: 8 })}`;
+}
+
+function truncateAddress(address, chars = 4){
+  return address ? `${address.slice(0, chars)}...${address.slice(-chars)}` : '--';
+}
+
+function setPurchaseStatus(message = '', type = 'info', link = null, linkLabel = 'View transaction ↗'){
+  const status = document.getElementById('purchase-status');
+  status.className = `purchase-status ${message ? `is-${type}` : ''}`;
+  status.replaceChildren();
+  if (!message) return;
+  const text = document.createElement('span');
+  text.textContent = message;
+  status.appendChild(text);
+  if (link) {
+    const anchor = document.createElement('a');
+    anchor.href = link;
+    anchor.target = '_blank';
+    anchor.rel = 'noreferrer';
+    anchor.textContent = linkLabel;
+    status.appendChild(anchor);
+  }
+}
+
+async function apiRequest(path, options = {}){
+  const response = await fetch(`${PRESALE_API_BASE}${path}`, {
+    cache: 'no-store',
+    ...options,
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(body.error || `Request failed (${response.status}).`);
+  return body;
+}
+
+function renderStage(stage){
+  const row = document.querySelector(`[data-stage-id="${stage.id}"]`);
+  if (!row) return;
+  row.classList.toggle('active', stage.status === 'active');
+  row.classList.toggle('sold-out', stage.status === 'sold-out');
+  row.querySelector('[data-stage-price]').textContent = formatTokenPrice(stage.priceUsd);
+  row.querySelector('[data-stage-sold]').textContent = formatTokenAmount(stage.soldBatc);
+  row.querySelector('[data-stage-raised]').textContent = formatFiat(stage.raisedUsd);
+  const icon = stage.status === 'active' ? 'flame' : stage.status === 'sold-out' ? 'check' : 'lock';
+  row.querySelector('.tag').innerHTML = `<svg data-lucide="${icon}" class="icon"></svg>${stage.label}`;
+}
+
+function renderPresaleState(state){
+  presaleState = state;
+  endDate = new Date(state.endAt);
+  updateCountdown();
+  const raised = safeNumber(state.raisedUsd) || 0;
+  const target = safeNumber(state.targetUsd) || 0;
+  document.getElementById('raised-amount').textContent = formatTokenAmount(raised, true);
+  document.getElementById('goal-amount').textContent = formatTokenAmount(target, true);
+  document.getElementById('participant-count').textContent = formatTokenAmount(state.participants, true);
+  document.getElementById('total-sold').textContent = `${formatTokenAmount(state.soldBatc, true)} BATC`;
+  document.getElementById('total-raised').textContent = formatFiat(state.raisedUsd);
+  const progress = target > 0 ? raised / target * 100 : 0;
+  renderProgress(progress);
+  document.getElementById('hero-presale-sold').textContent = `${Math.round(progress)}%`;
+  state.stages.forEach(renderStage);
+
+  const currentPrice = formatTokenPrice(state.currentPriceUsd);
+  document.getElementById('token-price').textContent = currentPrice;
+  document.getElementById('hero-current-price').textContent = currentPrice;
+  const usdcTab = document.querySelector('[data-method="USDC"]');
+  usdcTab.disabled = !state.paymentMethods.USDC;
+  usdcTab.title = state.paymentMethods.USDC ? '' : 'Test USDC mint is not configured';
+  if (!state.paymentMethods[currentMethod]) setMethod('SOL', document.querySelector('[data-method="SOL"]'));
+  updateRateText();
+  calc();
+
+  const button = document.getElementById('buy-button');
+  button.disabled = !state.configured || state.ended;
+  if (!state.configured) {
+    setPurchaseStatus('Testnet treasury is not configured. Add the server environment values to enable payments.', 'warning');
+  } else if (state.ended) {
+    setPurchaseStatus('The presale is closed.', 'warning');
+  }
+  if (window.lucide) lucide.createIcons();
+}
+
+async function refreshPresaleState({ quiet = false } = {}){
+  try {
+    const state = await apiRequest('/api/presale/state');
+    renderPresaleState(state);
+    if (state.chainStatus === 'degraded') {
+      setPurchaseStatus('Testnet RPC is temporarily unavailable. Showing the last verified totals.', 'warning');
+    } else if (!quiet && state.configured && !state.ended) {
+      setPurchaseStatus('Live testnet data loaded.', 'success');
+    }
+  } catch (error) {
+    if (!quiet) setPurchaseStatus(`${error.message} Retry in a moment.`, 'error');
+  }
+}
+
+function updateRateText(){
+  const price = safeNumber(presaleState?.currentPriceUsd);
+  const solUsd = safeNumber(presaleState?.solUsdPrice);
+  const rate = price && (currentMethod === 'USDC' || solUsd) ? (currentMethod === 'SOL' ? solUsd / price : 1 / price) : null;
+  document.getElementById('rateText').textContent = rate === null
+    ? 'Live rate unavailable'
+    : `1 ${currentMethod} = ${formatTokenAmount(rate, true)} BATC`;
+  document.getElementById('rateText').title = presaleState?.priceSource || '';
+}
+
 function renderQuickAmounts(){
   const wrap = document.getElementById('quickAmounts');
   wrap.innerHTML = '';
@@ -200,23 +338,37 @@ function renderQuickAmounts(){
     btn.type = 'button';
     btn.className = 'quick-amt';
     btn.textContent = preset.label;
-    btn.onclick = () => {
-      document.getElementById('payAmount').value = preset.value;
-      wrap.querySelectorAll('.quick-amt').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      calc();
+    btn.onclick = async () => {
+      try {
+        let value = preset.value;
+        if (value === 'max') {
+          if (!connectedWallet) throw new Error('Connect Phantom to load your testnet balance.');
+          const connection = new solanaWeb3.Connection(presaleState.rpcUrl, 'confirmed');
+          const lamports = await connection.getBalance(new solanaWeb3.PublicKey(connectedWallet), 'confirmed');
+          value = Math.max(0, (lamports - 10000000) / solanaWeb3.LAMPORTS_PER_SOL).toFixed(4);
+        }
+        document.getElementById('payAmount').value = value;
+        wrap.querySelectorAll('.quick-amt').forEach(button => button.classList.remove('active'));
+        btn.classList.add('active');
+        calc();
+      } catch (error) {
+        setPurchaseStatus(error.message, 'warning');
+      }
     };
     wrap.appendChild(btn);
   });
 }
 
-// Switch between SOL / USDC as the payment method (called from the buy-tab onclick)
 function setMethod(method, el){
+  if (el.disabled) return;
   currentMethod = method;
-  document.querySelectorAll('.buy-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
+  document.querySelectorAll('.buy-tab').forEach(tab => {
+    const selected = tab === el;
+    tab.classList.toggle('active', selected);
+    tab.setAttribute('aria-selected', String(selected));
+  });
   document.getElementById('payUnit').textContent = method;
-  document.getElementById('rateText').textContent = method === 'SOL' ? '1 SOL = 30,000 BATC' : '1 USDC = 200 BATC';
+  updateRateText();
   renderQuickAmounts();
   calc();
 }
@@ -236,7 +388,7 @@ function animateReceiveTo(target){
     el.value = target > 0 ? target.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '';
     return;
   }
-  const duration = 350;
+  const duration = 280;
   const startTime = performance.now();
   function frame(now){
     const t = Math.min((now - startTime) / duration, 1);
@@ -257,7 +409,9 @@ function animateReceiveTo(target){
 // and briefly flash the input box border to give feedback that the value changed
 function calc(){
   const pay = parseFloat(document.getElementById('payAmount').value) || 0;
-  const target = pay * rates[currentMethod];
+  const price = safeNumber(presaleState?.currentPriceUsd);
+  const solUsd = safeNumber(presaleState?.solUsdPrice);
+  const target = price ? pay * (currentMethod === 'SOL' ? solUsd || 0 : 1) / price : 0;
   animateReceiveTo(target);
   const box = document.getElementById('payBox');
   box.classList.add('pulse-in');
@@ -272,14 +426,148 @@ function onPayAmountInput(){
   calc();
 }
 
-// Initial render of the quick-amount buttons on page load
-renderQuickAmounts();
-
-// Placeholder for the "Connect Wallet & Buy" button — this is a static demo,
-// so there is no real Web3/wallet integration wired up here
-function connectWallet(){
-  alert('The wallet-connect feature requires backend / Web3 provider integration (e.g. MetaMask, WalletConnect), which is not included in this static demo.');
+function updateWalletUi(publicKey){
+  connectedWallet = publicKey?.toString?.() || null;
+  const line = document.getElementById('wallet-line');
+  line.hidden = !connectedWallet;
+  document.getElementById('wallet-address').textContent = truncateAddress(connectedWallet);
+  document.getElementById('wallet-address').title = connectedWallet || '';
+  document.getElementById('buy-button-label').textContent = connectedWallet ? 'Review Purchase' : 'Connect Phantom';
 }
+
+function getPhantomProvider(){
+  const provider = window.phantom?.solana;
+  return provider?.isPhantom ? provider : null;
+}
+
+async function connectWallet(){
+  if (!presaleState?.configured || presaleState?.ended) return;
+  const button = document.getElementById('buy-button');
+  try {
+    if (!connectedWallet) {
+      phantomProvider = getPhantomProvider();
+      if (!phantomProvider) {
+        setPurchaseStatus('Phantom is not installed. Install it, then return to continue.', 'warning', 'https://phantom.com/', 'Install Phantom ↗');
+        return;
+      }
+      button.disabled = true;
+      button.setAttribute('aria-busy', 'true');
+      document.getElementById('buy-button-label').textContent = 'Connecting…';
+      const response = await phantomProvider.connect();
+      updateWalletUi(response.publicKey);
+      setPurchaseStatus('Phantom connected to the testnet purchase flow.', 'success');
+      return;
+    }
+    await reviewPurchase();
+  } catch (error) {
+    if (error.code !== 4001) setPurchaseStatus(error.message || 'Could not connect Phantom.', 'error');
+  } finally {
+    button.disabled = !presaleState?.configured || presaleState?.ended;
+    button.removeAttribute('aria-busy');
+    if (connectedWallet) document.getElementById('buy-button-label').textContent = 'Review Purchase';
+  }
+}
+
+async function reviewPurchase(){
+  const payAmount = document.getElementById('payAmount').value.trim();
+  if (!payAmount || Number(payAmount) <= 0) {
+    setPurchaseStatus('Enter the amount you want to pay first.', 'warning');
+    document.getElementById('payAmount').focus();
+    return;
+  }
+  setPurchaseStatus('Creating a verified five-minute quote…', 'info');
+  pendingQuote = await apiRequest('/api/presale/quote', {
+    method: 'POST',
+    body: JSON.stringify({ wallet: connectedWallet, method: currentMethod, payAmount }),
+  });
+  document.getElementById('confirm-pay').textContent = `${pendingQuote.payAmount} ${pendingQuote.method}`;
+  document.getElementById('confirm-receive').textContent = `${formatTokenAmount(pendingQuote.batcAmount, true)} BATC`;
+  document.getElementById('confirm-price').textContent = formatTokenPrice(pendingQuote.tokenPriceUsd);
+  document.getElementById('confirm-stage').textContent = pendingQuote.stageLabel;
+  document.getElementById('confirm-treasury').textContent = truncateAddress(pendingQuote.treasury, 6);
+  document.getElementById('confirm-treasury').title = pendingQuote.treasury;
+  document.getElementById('purchase-dialog').showModal();
+  setPurchaseStatus('Review the exact testnet transfer before signing.', 'info');
+}
+
+async function submitPurchase(){
+  if (!pendingQuote || !phantomProvider) return;
+  const confirmButton = document.getElementById('confirm-purchase');
+  confirmButton.disabled = true;
+  confirmButton.setAttribute('aria-busy', 'true');
+  confirmButton.textContent = 'Waiting for Phantom…';
+  try {
+    const bytes = Uint8Array.from(atob(pendingQuote.transaction), character => character.charCodeAt(0));
+    const transaction = solanaWeb3.Transaction.from(bytes);
+    const connection = new solanaWeb3.Connection(presaleState.rpcUrl, 'confirmed');
+    const simulation = await connection.simulateTransaction(transaction);
+    if (simulation.value.err) throw new Error('The testnet transaction did not pass simulation. Check your balance and try again.');
+
+    const { signature } = await phantomProvider.signAndSendTransaction(transaction);
+    document.getElementById('purchase-dialog').close();
+    const explorer = `https://explorer.solana.com/tx/${signature}?cluster=testnet`;
+    setPurchaseStatus('Transaction submitted. Waiting for testnet confirmation…', 'info', explorer);
+    await connection.confirmTransaction({
+      signature,
+      blockhash: pendingQuote.blockhash,
+      lastValidBlockHeight: pendingQuote.lastValidBlockHeight,
+    }, 'confirmed');
+    await apiRequest('/api/presale/verify', {
+      method: 'POST',
+      body: JSON.stringify({ signature, quoteToken: pendingQuote.quoteToken }),
+    });
+    document.getElementById('payAmount').value = '';
+    animateReceiveTo(0);
+    pendingQuote = null;
+    await refreshPresaleState({ quiet: true });
+    setPurchaseStatus('Payment confirmed. Your BATC allocation is recorded.', 'success', explorer);
+  } catch (error) {
+    if (error.code === 4001) {
+      setPurchaseStatus('Transaction cancelled. No payment was sent.', 'info');
+    } else {
+      setPurchaseStatus(error.message || 'The transaction could not be completed.', 'error');
+    }
+  } finally {
+    confirmButton.disabled = false;
+    confirmButton.removeAttribute('aria-busy');
+    confirmButton.textContent = 'Sign in Phantom';
+  }
+}
+
+document.getElementById('confirm-purchase').addEventListener('click', submitPurchase);
+document.getElementById('copy-wallet').addEventListener('click', async () => {
+  if (!connectedWallet) return;
+  await navigator.clipboard.writeText(connectedWallet);
+  setPurchaseStatus('Wallet address copied.', 'success');
+});
+document.getElementById('confirm-treasury').addEventListener('click', async () => {
+  if (!pendingQuote?.treasury) return;
+  await navigator.clipboard.writeText(pendingQuote.treasury);
+  document.getElementById('confirm-treasury').textContent = 'Copied';
+  window.setTimeout(() => {
+    if (pendingQuote) document.getElementById('confirm-treasury').textContent = truncateAddress(pendingQuote.treasury, 6);
+  }, 1200);
+});
+document.getElementById('disconnect-wallet').addEventListener('click', async () => {
+  try { await phantomProvider?.disconnect(); } catch {}
+  updateWalletUi(null);
+  setPurchaseStatus('Phantom disconnected.', 'info');
+});
+
+renderQuickAmounts();
+refreshPresaleState();
+presaleRefreshTimer = window.setInterval(() => refreshPresaleState({ quiet: true }), 15000);
+
+window.addEventListener('load', async () => {
+  phantomProvider = getPhantomProvider();
+  if (!phantomProvider) return;
+  phantomProvider.on('disconnect', () => updateWalletUi(null));
+  phantomProvider.on('accountChanged', publicKey => updateWalletUi(publicKey));
+  try {
+    const response = await phantomProvider.connect({ onlyIfTrusted: true });
+    updateWalletUi(response.publicKey);
+  } catch {}
+});
 
 // Notify-me form — front-end only for this static demo. Wire this up to
 // a real mailing-list endpoint (Mailchimp, backend API, etc.) to actually

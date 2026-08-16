@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="presale-api-base" content="">
 <title>BATTLE CITIES</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Chakra+Petch:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -12,6 +13,7 @@
 <script src="js/vendor/cherry-embed-sdk-0.1.6.js" defer></script>
 <script src="js/vendor/gsap.min.js" defer></script>
 <script src="js/vendor/ScrollTrigger.min.js" defer></script>
+<script src="js/vendor/solana-web3.min.js" defer></script>
 <!-- Page styles, moved out into its own file -->
 <link rel="stylesheet" href="css/style.css">
 </head>
@@ -78,9 +80,9 @@
       </a>
       <!-- Quick-glance stats row -->
       <div class="hero-stats">
-        <div><div class="num"><svg data-lucide="trending-up" class="icon"></svg><span class="text-white">$0.005</span></div><div class="lbl">Current Price</div></div>
+        <div><div class="num"><svg data-lucide="trending-up" class="icon"></svg><span class="text-white" id="hero-current-price">$0.005</span></div><div class="lbl">Current Price</div></div>
         <div><div class="num"><svg data-lucide="coins" class="icon"></svg><span class="text-white">1B</span></div><div class="lbl">Total Supply</div></div>
-        <div><div class="num"><svg data-lucide="flame" class="icon"></svg><span class="text-white">40%</span></div><div class="lbl">Presale Sold</div></div>
+        <div><div class="num"><svg data-lucide="flame" class="icon"></svg><span class="text-white" id="hero-presale-sold">--</span></div><div class="lbl">Presale Sold</div></div>
         <div><div class="num"><svg data-lucide="shield-alert" class="icon"></svg><span class="text-white">SOLANA</span></div><div class="lbl">Network</div></div>
       </div>
     </div>
@@ -123,8 +125,8 @@
           <div class="info-row"><span class="k"><svg data-lucide="link" class="icon"></svg>Standard</span><span class="v">SPL Token (Solana)</span></div>
           <div class="info-row"><span class="k"><svg data-lucide="coins" class="icon"></svg>Total Supply</span><span class="v">1,000,000,000 BATC</span></div>
           <div class="info-row"><span class="k"><svg data-lucide="gamepad-2" class="icon"></svg>Utility</span><span class="v accent">In-game Economy</span></div>
-          <div class="info-row"><span class="k"><svg data-lucide="lock" class="icon"></svg>Network</span><span class="v">Solana Mainnet</span></div>
-          <div class="info-row"><span class="k"><svg data-lucide="shield-check" class="icon"></svg>On-chain Details</span><span class="v accent">Verifiable</span></div>
+          <div class="info-row"><span class="k"><svg data-lucide="lock" class="icon"></svg>Network</span><span class="v">Solana Testnet</span></div>
+          <div class="info-row"><span class="k"><svg data-lucide="shield-check" class="icon"></svg>Token Mint</span><span class="v accent">Published At Launch</span></div>
         </div>
       </div>
     </div>
@@ -154,8 +156,8 @@
       <div class="tl-dot"></div>
       <div class="tl-marker mono">Q2 2026</div>
       <div class="tl-body">
-        <h3><svg data-lucide="check-circle-2" class="icon"></svg>Contract Deployed & Audited</h3>
-        <p>$BATC SPL token launched on Solana with its token details available on-chain.</p>
+        <h3><svg data-lucide="check-circle-2" class="icon"></svg>Game & Testnet Infrastructure</h3>
+        <p>BattleCities is live while the presale payment and allocation system is verified on Solana testnet.</p>
       </div>
     </div>
     <div class="tl-item now reveal">
@@ -189,7 +191,7 @@
 <!-- Numbers below (cd-d / cd-h / cd-m / cd-s) are updated every second by script.js -->
 <section class="countdown-section" id="countdown-section">
   <div class="cds-inner">
-    <div class="sec-tag center"><svg data-lucide="timer" class="icon"></svg>Don't Miss Stage 1</div>
+    <div class="sec-tag center"><svg data-lucide="timer" class="icon"></svg>Presale Deadline</div>
     <h2 class="cds-title">Presale Ends In</h2>
     <div class="clock mono cds-clock" id="countdown">
       <div class="box"><div class="n" id="cd-d">00</div><div class="u">Days</div></div>
@@ -220,37 +222,36 @@
       <div class="pixel-frame hover-lift reveal">
         <div class="pixel-frame-inner terminal-body">
           <div class="progress-top">
-            <!-- raised-amount / goal-amount are static text; progress bar segments + % are built by script.js -->
-            <div class="raised-summary"><span class="raised" id="raised-amount">1,000</span><span class="raised-label">USDC raised</span></div>
-            <div class="goal mono">Target: <span id="goal-amount">3,025</span> USDC</div>
+            <div class="raised-summary"><span class="raised" id="raised-amount">--</span><span class="raised-label">USD raised</span></div>
+            <div class="goal mono">Target: <span id="goal-amount">3,025</span> USD</div>
           </div>
           <div class="progress-track" id="progress-track"></div>
           <div class="progress-meta">
             <span><svg data-lucide="trending-up" class="icon"></svg> <span id="progress-pct">33</span>% Reached</span>
-            <span class="accent"><svg data-lucide="users" class="icon"></svg> 4,120 Participants</span>
+            <span class="accent"><svg data-lucide="users" class="icon"></svg> <span id="participant-count">--</span> Participants</span>
           </div>
 
           <div class="stage-list" aria-label="Presale stages">
             <div class="stage stage-head" aria-hidden="true">
               <span>Stage</span><span>Price</span><span>BATC Sold</span><span>Raised</span>
             </div>
-            <div class="stage active">
+            <div class="stage active" data-stage-id="1">
               <span class="tag"><svg data-lucide="flame" class="icon"></svg>Stage 1</span>
-              <span class="price">$0.005</span>
-              <span class="stage-value">200,000</span>
-              <span class="stage-value">$1,000</span>
+              <span class="price" data-stage-price>$0.005</span>
+              <span class="stage-value" data-stage-sold>--</span>
+              <span class="stage-value" data-stage-raised>--</span>
             </div>
-            <div class="stage">
+            <div class="stage" data-stage-id="2">
               <span class="tag"><svg data-lucide="lock" class="icon"></svg>Stage 2</span>
-              <span class="price">$0.006</span>
-              <span class="stage-value">150,000</span>
-              <span class="stage-value">$900</span>
+              <span class="price" data-stage-price>$0.006</span>
+              <span class="stage-value" data-stage-sold>--</span>
+              <span class="stage-value" data-stage-raised>--</span>
             </div>
-            <div class="stage">
+            <div class="stage" data-stage-id="3">
               <span class="tag"><svg data-lucide="lock" class="icon"></svg>Stage 3</span>
-              <span class="price">$0.0075</span>
-              <span class="stage-value">150,000</span>
-              <span class="stage-value">$1,125</span>
+              <span class="price" data-stage-price>$0.0075</span>
+              <span class="stage-value" data-stage-sold>--</span>
+              <span class="stage-value" data-stage-raised>--</span>
             </div>
             <div class="stage">
               <span class="tag"><svg data-lucide="rocket" class="icon"></svg>DEX Launch</span>
@@ -259,7 +260,7 @@
               <span class="stage-value">&mdash;</span>
             </div>
             <div class="stage stage-total">
-              <span>Total</span><span></span><span>500,000</span><span>$3,025</span>
+              <span>Total</span><span></span><span id="total-sold">--</span><span id="total-raised">--</span>
             </div>
           </div>
 
@@ -271,15 +272,15 @@
     <!-- Right column: buy widget (pay amount -> receive amount calculator) -->
     <div class="pixel-frame hover-lift reveal">
       <div class="pixel-frame-inner terminal-body">
-        <div class="buy-tabs">
-          <div class="buy-tab active" data-method="SOL" onclick="setMethod('SOL', this)"><svg data-lucide="coins" class="icon"></svg>Pay with SOL</div>
-          <div class="buy-tab" data-method="USDC" onclick="setMethod('USDC', this)"><svg data-lucide="dollar-sign" class="icon"></svg>Pay with USDC</div>
+        <div class="buy-tabs" role="tablist" aria-label="Payment method">
+          <button type="button" class="buy-tab active" role="tab" aria-selected="true" data-method="SOL" onclick="setMethod('SOL', this)"><svg data-lucide="coins" class="icon"></svg>Pay with SOL</button>
+          <button type="button" class="buy-tab" role="tab" aria-selected="false" data-method="USDC" onclick="setMethod('USDC', this)"><svg data-lucide="dollar-sign" class="icon"></svg>Pay with USDC</button>
         </div>
 
         <div class="field">
           <label>You Pay</label>
           <div class="input-box" id="payBox">
-            <input type="number" id="payAmount" placeholder="0.0" min="0" oninput="onPayAmountInput()">
+            <input type="number" id="payAmount" placeholder="0.0" min="0" step="any" inputmode="decimal" autocomplete="off" oninput="onPayAmountInput()">
             <span class="unit" id="payUnit">SOL</span>
           </div>
           <!-- Quick-amount preset buttons are injected here by script.js -->
@@ -296,16 +297,39 @@
           </div>
         </div>
 
-        <div class="rate-line"><span>Current Rate</span><span id="rateText">1 SOL = 30,000 BATC</span></div>
-        <div class="rate-line"><span>Price per Token</span><span>$0.005</span></div>
+        <div class="rate-line"><span>Current Rate</span><span id="rateText">Loading live rate…</span></div>
+        <div class="rate-line"><span>Price per Token</span><span id="token-price">$0.005</span></div>
+        <div class="wallet-line" id="wallet-line" hidden><span class="wallet-dot" aria-hidden="true"></span><span id="wallet-address"></span><button type="button" id="copy-wallet">Copy</button><button type="button" id="disconnect-wallet">Disconnect</button></div>
 
-        <!-- Static demo only: connectWallet() just shows an explanatory alert -->
-        <button class="btn btn-primary buy-btn" onclick="connectWallet()"><svg data-lucide="wallet" class="icon"></svg>Connect Wallet & Buy</button>
-        <p class="buy-note"><svg data-lucide="triangle-alert" class="icon"></svg>Make sure your Solana wallet is connected to Solana Mainnet before making a transaction.</p>
+        <button class="btn btn-primary buy-btn" id="buy-button" type="button" onclick="connectWallet()"><svg data-lucide="wallet" class="icon"></svg><span id="buy-button-label">Connect Phantom</span></button>
+        <div class="purchase-status" id="purchase-status" role="status" aria-live="polite"></div>
+        <p class="buy-note"><svg data-lucide="triangle-alert" class="icon"></svg><span><b>TESTNET:</b> Enable testnet mode in Phantom. Payments use test assets and create a BATC allocation record; no BATC token is distributed yet.</span></p>
       </div>
     </div>
   </div>
 </section>
+
+<dialog class="purchase-dialog" id="purchase-dialog" aria-labelledby="purchase-dialog-title">
+  <form method="dialog" class="purchase-dialog-card pixel-frame">
+    <div class="pixel-frame-inner">
+      <div class="sec-tag"><svg data-lucide="shield-check" class="icon"></svg>Verify Transaction</div>
+      <h3 id="purchase-dialog-title">Review testnet purchase</h3>
+      <dl class="purchase-breakdown">
+        <div><dt>You pay</dt><dd id="confirm-pay">--</dd></div>
+        <div><dt>Allocation</dt><dd id="confirm-receive">--</dd></div>
+        <div><dt>Token price</dt><dd id="confirm-price">--</dd></div>
+        <div><dt>Stage</dt><dd id="confirm-stage">--</dd></div>
+        <div><dt>Network</dt><dd>Solana testnet</dd></div>
+        <div><dt>Treasury</dt><dd><button type="button" id="confirm-treasury" class="copy-address mono" title="Copy full treasury address">--</button></dd></div>
+      </dl>
+      <p class="dialog-note">Phantom will show the exact transfer before you sign. Network fees are additional.</p>
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" value="cancel">Cancel</button>
+        <button class="btn btn-primary" id="confirm-purchase" value="default" type="button">Sign in Phantom</button>
+      </div>
+    </div>
+  </form>
+</dialog>
 
 <!-- ================= NOTIFY ME (email capture, front-end only) ================= -->
 <section class="notify" id="notify">
@@ -341,7 +365,7 @@
         <span class="faq-q"><svg data-lucide="cat" class="icon q-icon"></svg>What exactly is $BATC?</span>
         <svg data-lucide="chevron-down" class="icon chev"></svg>
       </summary>
-      <div class="faq-answer">$BATC is the game's SPL token on Solana, built around a fixed 1,000,000,000 supply and on-chain token mechanics anyone can verify.</div>
+      <div class="faq-answer">$BATC is the planned BattleCities SPL token on Solana with a fixed 1,000,000,000 supply. The mint address will be published when the token launches—ignore any address shared before that announcement.</div>
     </details>
 
     <details class="faq-item" name="faq-group">
@@ -349,7 +373,7 @@
         <span class="faq-q"><svg data-lucide="layers" class="icon q-icon"></svg>How does the presale work?</span>
         <svg data-lucide="chevron-down" class="icon chev"></svg>
       </summary>
-      <div class="faq-answer">The presale runs in fixed-price stages. Stage 1 is live now at $0.005, Stage 2 follows at $0.006, and Stage 3 is priced at $0.0075. Once a stage sells out — or the countdown timer hits zero — the price moves to the next stage and doesn't come back down.</div>
+      <div class="faq-answer">The presale runs in fixed-price stages. A stage changes only when its BATC allocation sells out. The entire presale closes when the countdown reaches zero, even if the current stage still has tokens available.</div>
     </details>
 
     <details class="faq-item" name="faq-group">
@@ -357,7 +381,7 @@
         <span class="faq-q"><svg data-lucide="lock" class="icon q-icon"></svg>Is the contract and liquidity actually locked?</span>
         <svg data-lucide="chevron-down" class="icon chev"></svg>
       </summary>
-      <div class="faq-answer">Token authority and liquidity information can be verified directly on Solana. Always confirm the mint address and current on-chain details before buying $BATC.</div>
+      <div class="faq-answer">The BATC mint and liquidity are not live yet. Their addresses, authority settings, and lock details will be published for independent on-chain verification before launch.</div>
     </details>
 
     <details class="faq-item" name="faq-group">
@@ -365,7 +389,7 @@
         <span class="faq-q"><svg data-lucide="rocket" class="icon q-icon"></svg>What happens after the presale ends?</span>
         <svg data-lucide="chevron-down" class="icon chev"></svg>
       </summary>
-      <div class="faq-answer">Once the presale target is reached, liquidity is added and $BATC lists on DEX at the listing price. Presale tokens are sent directly to the Solana wallet address used to buy.</div>
+      <div class="faq-answer">Testnet payments create a verified BATC allocation for the connected Solana wallet. BATC is not minted or distributed yet; claim and distribution details will be published and independently reviewed before token launch.</div>
     </details>
 
     <details class="faq-item" name="faq-group">
