@@ -429,9 +429,10 @@ section{position:relative;z-index:1;padding:70px 5% 90px;scroll-margin-top:var(-
   .purchase-wrap>.pixel-frame,.purchase-wrap>div>.pixel-frame{height:100%;box-sizing:border-box;}
 }
 
-.progress-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
-.progress-top .raised{font-family:'Press Start 2P';font-size:20px;color:var(--neon);}
-.progress-top .goal{font-family:'Share Tech Mono';font-size:13px;color:var(--gray);}
+.progress-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.raised-summary{display:flex;align-items:center;gap:7px;}
+.progress-top .raised{font-family:'Press Start 2P';font-size:20px;line-height:1;color:var(--neon);}
+.raised-label,.progress-top .goal{font-family:'Share Tech Mono';font-size:13px;line-height:1;color:var(--gray);}
 .progress-track{height:14px;background:var(--bg-panel-2);border:2px solid var(--line);overflow:hidden;display:flex;gap:2px;padding:2px;}
 .progress-track .seg{flex:1;background:var(--line);}
 .progress-track .seg.on{background:var(--neon);box-shadow:0 0 6px var(--neon-glow);}
