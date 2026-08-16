@@ -126,13 +126,13 @@ window.addEventListener('pagehide', clearWebsitePresence);
 
 // Token allocation breakdown used to render the allocation bars below
 const allocations = [
-  { name: "Ecosystem & Rewards", pct: 20 },
   { name: "Public Sale", pct: 39 },
-  { name: "Private Presale", pct: 1 },
+  { name: "Ecosystem & Rewards", pct: 20 },
   { name: "Liquidity & Staking", pct: 15 },
   { name: "Marketing", pct: 10 },
   { name: "Team", pct: 10 },
   { name: "Treasury", pct: 5 },
+  { name: "Private Presale", pct: 1 },
 ];
 
 // Build the allocation bar list dynamically from the array above
