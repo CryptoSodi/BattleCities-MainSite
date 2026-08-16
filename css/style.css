@@ -424,7 +424,10 @@ section{position:relative;z-index:1;padding:70px 5% 90px;scroll-margin-top:var(-
 
 /* ---------- PURCHASE / BUY FLOW ---------- */
 .purchase-wrap{display:grid;grid-template-columns:1fr;gap:50px;max-width:var(--max-width);margin:0 auto;}
-@media(min-width:960px){.purchase-wrap{grid-template-columns:1.05fr .95fr;align-items:start;}}
+@media(min-width:960px){
+  .purchase-wrap{grid-template-columns:1.05fr .95fr;align-items:stretch;}
+  .purchase-wrap>.pixel-frame,.purchase-wrap>div>.pixel-frame{height:100%;box-sizing:border-box;}
+}
 
 .progress-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
 .progress-top .raised{font-family:'Press Start 2P';font-size:20px;color:var(--neon);}
@@ -436,23 +439,17 @@ section{position:relative;z-index:1;padding:70px 5% 90px;scroll-margin-top:var(-
 .progress-meta .accent{color:var(--neon);}
 
 .stage-list{margin-top:26px;display:flex;flex-direction:column;gap:0;}
-.stage{padding:14px 0;border-bottom:1px solid var(--line);font-size:13px;}
+.stage{display:grid;grid-template-columns:1.2fr .8fr 1fr .8fr;align-items:center;padding:14px 0;border-bottom:1px solid var(--line);font-size:13px;gap:10px;}
 .stage:last-child{border-bottom:none;}
-.stage-main,.stage-meta{display:flex;align-items:center;justify-content:space-between;gap:16px;}
-.stage-main{min-height:24px;}
-.stage-price{color:var(--white);font-family:'Press Start 2P';font-size:11px;white-space:nowrap;}
-.stage-meta{margin-top:8px;color:var(--gray);font-family:'Share Tech Mono';font-size:12px;letter-spacing:.5px;}
-.stage-meta span:last-child{color:var(--white);text-align:right;}
+.stage-head{padding:0 0 8px;color:var(--gray);font-family:'Share Tech Mono';font-size:10px;letter-spacing:1px;text-transform:uppercase;}
+.stage-value{color:var(--white);font-family:'Share Tech Mono';font-size:13px;}
 .stage-total{color:var(--neon);font-family:'Press Start 2P';font-size:10px;border-bottom:none;padding-top:16px;}
-.stage-total .stage-meta{color:var(--neon);font-size:11px;}
-.stage-total .stage-meta span:last-child{color:var(--neon);}
 @media(max-width:480px){
-  .stage{padding:12px 0;}
-  .stage-main,.stage-meta{gap:10px;}
-  .stage-meta{font-size:11px;}
+  .stage{grid-template-columns:1.2fr .8fr 1fr .8fr;gap:6px;padding:12px 0;font-size:11px;}
+  .stage-head{font-size:8px;}
+  .stage-value{font-size:11px;}
 }
-.stage .tag{width:150px;box-sizing:border-box;font-family:'Share Tech Mono';font-size:10px;letter-spacing:1px;padding:3px 8px;border:1px solid var(--neon-dim);color:var(--neon);text-transform:uppercase;display:flex;align-items:center;gap:5px;}
-@media(max-width:480px){.stage .tag{width:132px;}}
+.stage .tag{width:100%;box-sizing:border-box;font-family:'Share Tech Mono';font-size:10px;letter-spacing:1px;padding:3px 8px;border:1px solid var(--neon-dim);color:var(--neon);text-transform:uppercase;display:flex;align-items:center;gap:5px;}
 .stage.active .tag{background:var(--neon);color:#000;border-color:var(--neon);}
 .stage .price{color:var(--white);font-family:'Press Start 2P';font-size:11px;}
 .stage .status{color:var(--gray);font-size:11px;text-transform:uppercase;letter-spacing:1px;}
