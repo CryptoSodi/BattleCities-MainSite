@@ -351,7 +351,7 @@ section{position:relative;z-index:1;padding:70px 5% 90px;scroll-margin-top:var(-
 .tl-dot{width:14px;height:14px;border:2px solid var(--neon-dim);background:var(--bg-panel);margin-bottom:16px;position:relative;z-index:1;flex-shrink:0;}
 .tl-marker{font-family:'Press Start 2P';font-size:10px;color:var(--gray);margin-bottom:10px;}
 .tl-body h3{font-size:14px;letter-spacing:.5px;text-transform:uppercase;color:var(--white);display:flex;align-items:center;justify-content:center;gap:8px;}
-.tl-body h3 svg{color:var(--neon);}
+.tl-body h3 svg{width:22px;height:22px;stroke-width:2.2;color:var(--neon);flex-shrink:0;}
 .tl-body p{margin-top:8px;font-size:13px;color:var(--gray);line-height:1.6;}
 .tl-item.done .tl-dot{background:var(--neon);border-color:var(--neon);box-shadow:0 0 8px var(--neon-glow);}
 .tl-item.done .tl-marker{color:var(--neon);}
