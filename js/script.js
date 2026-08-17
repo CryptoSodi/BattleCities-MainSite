@@ -191,6 +191,8 @@ let currentMethod = 'SOL';
 let phantomProvider = null;
 let connectedWallet = null;
 let pendingQuote = null;
+let walletConnectionInFlight = false;
+let boundPhantomProvider = null;
 
 const quickAmountPresets = {
   SOL: [{ label: '0.5 SOL', value: 0.5 }, { label: '1 SOL', value: 1 }, { label: 'MAX', value: 'max' }],
@@ -435,26 +437,54 @@ function updateWalletUi(publicKey){
   document.getElementById('buy-button-label').textContent = connectedWallet ? 'Review Purchase' : 'Connect Phantom';
 }
 
+function resetWalletConnection(){
+  connectedWallet = null;
+  pendingQuote = null;
+  updateWalletUi(null);
+  const button = document.getElementById('buy-button');
+  button.disabled = !presaleState?.configured || presaleState?.ended;
+  button.removeAttribute('aria-busy');
+}
+
 function getPhantomProvider(){
   const provider = window.phantom?.solana;
   return provider?.isPhantom ? provider : null;
 }
 
+function bindPhantomEvents(provider){
+  if (!provider || boundPhantomProvider === provider) return;
+  boundPhantomProvider = provider;
+  provider.on('connect', publicKey => updateWalletUi(publicKey || provider.publicKey));
+  provider.on('disconnect', resetWalletConnection);
+  provider.on('accountChanged', publicKey => {
+    if (publicKey) {
+      updateWalletUi(publicKey);
+    } else {
+      resetWalletConnection();
+    }
+  });
+}
+
 async function connectWallet(){
   if (!presaleState?.configured || presaleState?.ended) return;
+  if (walletConnectionInFlight) return;
   const button = document.getElementById('buy-button');
   try {
     if (!connectedWallet) {
-      phantomProvider = getPhantomProvider();
+      phantomProvider = getPhantomProvider() || phantomProvider;
       if (!phantomProvider) {
         setPurchaseStatus('Phantom is not installed. Install it, then return to continue.', 'warning', 'https://phantom.com/', 'Install Phantom ↗');
         return;
       }
+      bindPhantomEvents(phantomProvider);
+      walletConnectionInFlight = true;
       button.disabled = true;
       button.setAttribute('aria-busy', 'true');
       document.getElementById('buy-button-label').textContent = 'Connecting…';
       const response = await phantomProvider.connect();
-      updateWalletUi(response.publicKey);
+      const publicKey = response?.publicKey || phantomProvider.publicKey;
+      if (!publicKey) throw new Error('Phantom did not return a wallet address. Unlock Phantom and try again.');
+      updateWalletUi(publicKey);
       setPurchaseStatus('Phantom connected to the testnet purchase flow.', 'success');
       return;
     }
@@ -462,6 +492,7 @@ async function connectWallet(){
   } catch (error) {
     if (error.code !== 4001) setPurchaseStatus(error.message || 'Could not connect Phantom.', 'error');
   } finally {
+    walletConnectionInFlight = false;
     button.disabled = !presaleState?.configured || presaleState?.ended;
     button.removeAttribute('aria-busy');
     if (connectedWallet) document.getElementById('buy-button-label').textContent = 'Review Purchase';
@@ -549,9 +580,19 @@ document.getElementById('confirm-treasury').addEventListener('click', async () =
   }, 1200);
 });
 document.getElementById('disconnect-wallet').addEventListener('click', async () => {
-  try { await phantomProvider?.disconnect(); } catch {}
-  updateWalletUi(null);
-  setPurchaseStatus('Phantom disconnected.', 'info');
+  const provider = phantomProvider;
+  const disconnectButton = document.getElementById('disconnect-wallet');
+  disconnectButton.disabled = true;
+  try {
+    await provider?.disconnect();
+  } catch (error) {
+    console.warn('Unable to disconnect Phantom.', error);
+  } finally {
+    resetWalletConnection();
+    phantomProvider = null;
+    disconnectButton.disabled = false;
+    setPurchaseStatus('Phantom disconnected. You can connect again whenever you are ready.', 'info');
+  }
 });
 
 renderQuickAmounts();
@@ -561,8 +602,7 @@ presaleRefreshTimer = window.setInterval(() => refreshPresaleState({ quiet: true
 window.addEventListener('load', async () => {
   phantomProvider = getPhantomProvider();
   if (!phantomProvider) return;
-  phantomProvider.on('disconnect', () => updateWalletUi(null));
-  phantomProvider.on('accountChanged', publicKey => updateWalletUi(publicKey));
+  bindPhantomEvents(phantomProvider);
   try {
     const response = await phantomProvider.connect({ onlyIfTrusted: true });
     updateWalletUi(response.publicKey);
