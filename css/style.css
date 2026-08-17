@@ -70,12 +70,6 @@ a{color:inherit;text-decoration:none;}
 .pixel{font-family:'Press Start 2P',monospace;}
 .accent{color:var(--neon);}
 
-.pixel-divider{
-  height:8px;width:100%;
-  background-image:repeating-linear-gradient(90deg,var(--neon) 0 8px, transparent 8px 16px);
-  opacity:.5;
-}
-
 /* Reusable glitch text effect (used on hero title + mobile Buy tab) */
 .glitch{position:relative;display:inline-block;color:var(--neon);}
 .glitch::before,.glitch::after{
@@ -373,20 +367,9 @@ section{position:relative;z-index:1;padding:70px 5% 90px;scroll-margin-top:var(-
   .tl-dot{margin-bottom:0;margin-top:5px;}
 }
 
-/* ---------- COUNTDOWN SECTION ---------- */
-/* Its own centered block between the roadmap and the buy flow. Colors are
-   deliberately NOT all-neon: white-bordered boxes for Days/Hours/Minutes
-   keep the palette calm and readable, while only the Seconds box carries
-   the neon glow — a single accent draws the eye to "time is actively
-   moving" without painting the whole thing green. */
-.countdown-section{
-  display:flex;align-items:center;justify-content:center;text-align:center;
-  min-height:60vh;
-  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
-  background:linear-gradient(180deg,transparent,rgba(255,255,255,.025),transparent);
-}
-@media(max-width:640px){ .countdown-section{min-height:44vh;} }
-.cds-inner{max-width:640px;margin:0 auto;display:flex;flex-direction:column;align-items:center;}
+/* ---------- PURCHASE / BUY FLOW ---------- */
+.purchase-deadline{max-width:var(--max-width);margin:0 auto 50px;text-align:center;}
+.purchase-deadline-inner{padding:30px;display:flex;flex-direction:column;align-items:center;}
 .cds-title{font-family:'Press Start 2P',monospace;font-size:clamp(18px,3vw,28px);color:var(--white);margin:18px 0 36px;line-height:1.5;}
 .cds-clock{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;}
 .cds-clock .box{background:var(--bg-panel);border:2px solid var(--neon-dim);min-width:76px;padding:16px 14px;box-shadow:0 0 8px rgba(255,179,15,.18);transition:box-shadow .2s,border-color .2s;}
@@ -398,13 +381,14 @@ section{position:relative;z-index:1;padding:70px 5% 90px;scroll-margin-top:var(-
 .cds-note{margin-top:28px;font-size:13px;color:var(--gray);display:flex;align-items:center;gap:8px;}
 .cds-note svg{color:var(--danger);flex-shrink:0;}
 @media(max-width:640px){
+  .purchase-deadline{margin-bottom:38px;}
+  .purchase-deadline-inner{padding:26px 18px;}
   .cds-clock{gap:6px;}
   .cds-clock .box{min-width:58px;padding:12px 8px;}
   .cds-clock .box .n{font-size:16px;}
   .cds-colon{font-size:14px;}
 }
 
-/* ---------- PURCHASE / BUY FLOW ---------- */
 .purchase-wrap{display:grid;grid-template-columns:1fr;gap:50px;max-width:var(--max-width);margin:0 auto;}
 @media(min-width:960px){
   .purchase-wrap{grid-template-columns:1.05fr .95fr;align-items:stretch;}
