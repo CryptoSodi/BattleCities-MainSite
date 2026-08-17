@@ -222,8 +222,8 @@
       <div class="pixel-frame hover-lift reveal">
         <div class="pixel-frame-inner terminal-body">
           <div class="progress-top">
-            <div class="raised-summary"><span class="raised" id="raised-amount">--</span><span class="raised-label">USD raised</span></div>
-            <div class="goal mono">Target: <span id="goal-amount">3,025</span> USD</div>
+            <div class="raised-summary"><span class="raised" id="raised-amount">--</span><span class="raised-label">SOL raised</span></div>
+            <div class="goal mono">Target: <span id="goal-amount">30</span> SOL</div>
           </div>
           <div class="progress-track" id="progress-track"></div>
           <div class="progress-meta">
@@ -233,7 +233,7 @@
 
           <div class="stage-list" aria-label="Presale stages">
             <div class="stage stage-head" aria-hidden="true">
-              <span>Stage</span><span>Price</span><span>BATC Sold</span><span>Raised</span>
+              <span>Stage</span><span>Price (SOL)</span><span>BATC Sold</span><span>SOL Raised</span>
             </div>
             <div class="stage active" data-stage-id="1">
               <span class="tag"><svg data-lucide="flame" class="icon"></svg>Stage 1</span>
@@ -272,9 +272,8 @@
     <!-- Right column: buy widget (pay amount -> receive amount calculator) -->
     <div class="pixel-frame hover-lift reveal">
       <div class="pixel-frame-inner terminal-body">
-        <div class="buy-tabs" role="tablist" aria-label="Payment method">
-          <button type="button" class="buy-tab active" role="tab" aria-selected="true" data-method="SOL" onclick="setMethod('SOL', this)"><svg data-lucide="coins" class="icon"></svg>Pay with SOL</button>
-          <button type="button" class="buy-tab" role="tab" aria-selected="false" data-method="USDC" onclick="setMethod('USDC', this)"><svg data-lucide="dollar-sign" class="icon"></svg>Pay with USDC</button>
+        <div class="buy-tabs" aria-label="Payment method">
+          <div class="buy-tab active" aria-label="Pay with SOL"><svg data-lucide="coins" class="icon"></svg>Pay with SOL</div>
         </div>
 
         <div class="field">

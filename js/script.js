@@ -210,6 +210,12 @@ function formatFiat(value){
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Object.is(number, -0) ? 0 : number);
 }
 
+function formatSol(value){
+  const number = safeNumber(value);
+  if (number === null) return '--';
+  return new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 9 }).format(Object.is(number, -0) ? 0 : number);
+}
+
 function formatTokenAmount(value, detailed = false){
   const number = safeNumber(value);
   if (number === null) return '--';
@@ -265,9 +271,9 @@ function renderStage(stage){
   if (!row) return;
   row.classList.toggle('active', stage.status === 'active');
   row.classList.toggle('sold-out', stage.status === 'sold-out');
-  row.querySelector('[data-stage-price]').textContent = formatTokenPrice(stage.priceUsd);
+  row.querySelector('[data-stage-price]').textContent = `${formatSol(stage.priceSol)} SOL`;
   row.querySelector('[data-stage-sold]').textContent = formatTokenAmount(stage.soldBatc);
-  row.querySelector('[data-stage-raised]').textContent = formatFiat(stage.raisedUsd);
+  row.querySelector('[data-stage-raised]').textContent = `${formatSol(stage.raisedSol)} SOL`;
   const icon = stage.status === 'active' ? 'flame' : stage.status === 'sold-out' ? 'check' : 'lock';
   row.querySelector('.tag').innerHTML = `<svg data-lucide="${icon}" class="icon"></svg>${stage.label}`;
 }
@@ -276,25 +282,21 @@ function renderPresaleState(state){
   presaleState = state;
   endDate = new Date(state.endAt);
   updateCountdown();
-  const raised = safeNumber(state.raisedUsd) || 0;
-  const target = safeNumber(state.targetUsd) || 0;
-  document.getElementById('raised-amount').textContent = formatTokenAmount(raised, true);
-  document.getElementById('goal-amount').textContent = formatTokenAmount(target, true);
+  const raised = safeNumber(state.raisedSol) || 0;
+  const target = safeNumber(state.targetSol) || 0;
+  document.getElementById('raised-amount').textContent = formatSol(raised);
+  document.getElementById('goal-amount').textContent = formatSol(target);
   document.getElementById('participant-count').textContent = formatTokenAmount(state.participants, true);
   document.getElementById('total-sold').textContent = `${formatTokenAmount(state.soldBatc, true)} BATC`;
-  document.getElementById('total-raised').textContent = formatFiat(state.raisedUsd);
+  document.getElementById('total-raised').textContent = `${formatSol(state.raisedSol)} SOL`;
   const progress = target > 0 ? raised / target * 100 : 0;
   renderProgress(progress);
   document.getElementById('hero-presale-sold').textContent = `${Math.round(progress)}%`;
   state.stages.forEach(renderStage);
 
-  const currentPrice = formatTokenPrice(state.currentPriceUsd);
+  const currentPrice = `${formatSol(state.currentPriceSol)} SOL`;
   document.getElementById('token-price').textContent = currentPrice;
   document.getElementById('hero-current-price').textContent = currentPrice;
-  const usdcTab = document.querySelector('[data-method="USDC"]');
-  usdcTab.disabled = !state.paymentMethods.USDC;
-  usdcTab.title = state.paymentMethods.USDC ? '' : 'Test USDC mint is not configured';
-  if (!state.paymentMethods[currentMethod]) setMethod('SOL', document.querySelector('[data-method="SOL"]'));
   updateRateText();
   calc();
 
@@ -323,12 +325,11 @@ async function refreshPresaleState({ quiet = false } = {}){
 }
 
 function updateRateText(){
-  const price = safeNumber(presaleState?.currentPriceUsd);
-  const solUsd = safeNumber(presaleState?.solUsdPrice);
-  const rate = price && (currentMethod === 'USDC' || solUsd) ? (currentMethod === 'SOL' ? solUsd / price : 1 / price) : null;
+  const price = safeNumber(presaleState?.currentPriceSol);
+  const rate = price ? 1 / price : null;
   document.getElementById('rateText').textContent = rate === null
-    ? 'Live rate unavailable'
-    : `1 ${currentMethod} = ${formatTokenAmount(rate, true)} BATC`;
+    ? 'Rate unavailable'
+    : `1 SOL = ${formatTokenAmount(rate, true)} BATC`;
   document.getElementById('rateText').title = presaleState?.priceSource || '';
 }
 
@@ -411,9 +412,8 @@ function animateReceiveTo(target){
 // and briefly flash the input box border to give feedback that the value changed
 function calc(){
   const pay = parseFloat(document.getElementById('payAmount').value) || 0;
-  const price = safeNumber(presaleState?.currentPriceUsd);
-  const solUsd = safeNumber(presaleState?.solUsdPrice);
-  const target = price ? pay * (currentMethod === 'SOL' ? solUsd || 0 : 1) / price : 0;
+  const price = safeNumber(presaleState?.currentPriceSol);
+  const target = price ? pay / price : 0;
   animateReceiveTo(target);
   const box = document.getElementById('payBox');
   box.classList.add('pulse-in');
