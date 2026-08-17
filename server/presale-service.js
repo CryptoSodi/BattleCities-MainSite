@@ -186,6 +186,7 @@ class PresaleService {
       (sum, stage) => sum + (stage.priceMicros * stage.allocationMicros / TOKEN_SCALE),
       0n,
     );
+    const priceSol = stage => (Number(stage.priceMicros) / Number(USD_SCALE) / solPrice.value).toString();
 
     return {
       configured: this.isConfigured(),
@@ -201,6 +202,7 @@ class PresaleService {
       participants: new Set(records.map(record => record.wallet)).size,
       currentStageId: current?.id || null,
       currentPriceUsd: current ? decimalString(current.priceMicros, 6) : null,
+      currentPriceSol: current ? priceSol(current) : null,
       solUsdPrice: String(solPrice.value),
       priceSource: solPrice.source,
       paymentMethods: { SOL: true, USDC: Boolean(this.config.usdcMint) },
@@ -211,6 +213,7 @@ class PresaleService {
           id: stage.id,
           label: stage.label,
           priceUsd: decimalString(stage.priceMicros, 6),
+          priceSol: priceSol(stage),
           allocationBatc: decimalString(stage.allocationMicros, 6),
           soldBatc: decimalString(sold, 6),
           raisedUsd: decimalString(stageTotal.raisedMicros, 6),

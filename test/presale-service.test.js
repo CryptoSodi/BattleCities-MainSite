@@ -60,4 +60,10 @@ test('SOL quotes are derived from the active stage and signed by the backend', a
   assert.equal(payload.paymentAtomic, '1000000000');
   assert.equal(payload.stageId, 1);
   assert.ok(Buffer.from(quote.transaction, 'base64').length > 0);
+
+  const state = await service.state();
+  const activeStage = state.stages.find(stage => stage.id === state.currentStageId);
+  assert.equal(state.currentStageId, 1);
+  assert.equal(state.currentPriceSol, activeStage.priceSol);
+  assert.equal(Number(state.currentPriceSol) * 150, 0.005);
 });

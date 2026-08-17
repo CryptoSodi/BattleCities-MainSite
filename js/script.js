@@ -200,14 +200,6 @@ const quickAmountPresets = {
   USDC: [{ label: '100 USDC', value: 100 }, { label: '250 USDC', value: 250 }],
 };
 
-// Fixed SOL price for each public presale stage. Quotes reference a stage ID,
-// so the review dialog can always show the exact stage price before signing.
-const stagePricesSol = Object.freeze({
-  1: '0.00004',
-  2: '0.000066667',
-  3: '0.00008',
-});
-
 function safeNumber(value){
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
@@ -236,8 +228,7 @@ function formatTokenAmount(value, detailed = false){
 }
 
 function formatQuoteTokenPrice(quote){
-  const stagePrice = stagePricesSol[quote.stageId];
-  if (stagePrice) return `${formatSol(stagePrice)} SOL`;
+  if (quote.method === 'USDC') return `$${quote.tokenPriceUsd}`;
 
   const payAmount = safeNumber(quote.payAmount);
   const batcAmount = safeNumber(quote.batcAmount);
