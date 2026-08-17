@@ -273,7 +273,9 @@ function renderStage(stage){
   row.classList.toggle('sold-out', stage.status === 'sold-out');
   row.querySelector('[data-stage-price]').textContent = `${formatSol(stage.priceSol)} SOL`;
   row.querySelector('[data-stage-sold]').textContent = formatTokenAmount(stage.soldBatc);
-  row.querySelector('[data-stage-raised]').textContent = `${formatSol(stage.raisedSol)} SOL`;
+  const allocation = safeNumber(stage.allocationBatc) || 0;
+  const sold = safeNumber(stage.soldBatc) || 0;
+  row.querySelector('[data-stage-remaining]').textContent = formatTokenAmount(Math.max(0, allocation - sold));
   const icon = stage.status === 'active' ? 'flame' : stage.status === 'sold-out' ? 'check' : 'lock';
   row.querySelector('.tag').innerHTML = `<svg data-lucide="${icon}" class="icon"></svg>${stage.label}`;
 }
@@ -282,14 +284,23 @@ function renderPresaleState(state){
   presaleState = state;
   endDate = new Date(state.endAt);
   updateCountdown();
-  const raised = safeNumber(state.raisedSol) || 0;
-  const target = safeNumber(state.targetSol) || 0;
-  document.getElementById('raised-amount').textContent = formatSol(raised);
-  document.getElementById('goal-amount').textContent = formatSol(target);
+  const activeStage = state.stages.find(stage => stage.id === state.currentStageId) || null;
+  const allocation = safeNumber(activeStage?.allocationBatc) || 0;
+  const soldInStage = safeNumber(activeStage?.soldBatc) || 0;
+  const available = Math.max(0, allocation - soldInStage);
+  document.getElementById('available-batc').textContent = `${formatTokenAmount(available, true)} BATC`;
+  document.getElementById('stage-allocation').textContent = activeStage
+    ? `${activeStage.label} allocation: ${formatTokenAmount(allocation, true)} BATC`
+    : 'All presale stages are sold out';
   document.getElementById('participant-count').textContent = formatTokenAmount(state.participants, true);
   document.getElementById('total-sold').textContent = `${formatTokenAmount(state.soldBatc, true)} BATC`;
-  document.getElementById('total-raised').textContent = `${formatSol(state.raisedSol)} SOL`;
-  const progress = target > 0 ? raised / target * 100 : 0;
+  const totalAvailable = state.stages.reduce((sum, stage) => {
+    const stageAllocation = safeNumber(stage.allocationBatc) || 0;
+    const stageSold = safeNumber(stage.soldBatc) || 0;
+    return sum + Math.max(0, stageAllocation - stageSold);
+  }, 0);
+  document.getElementById('total-available').textContent = `${formatTokenAmount(totalAvailable, true)} BATC`;
+  const progress = allocation > 0 ? soldInStage / allocation * 100 : 0;
   renderProgress(progress);
   document.getElementById('hero-presale-sold').textContent = `${Math.round(progress)}%`;
   state.stages.forEach(renderStage);

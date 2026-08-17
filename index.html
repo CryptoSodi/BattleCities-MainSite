@@ -222,36 +222,36 @@
       <div class="pixel-frame hover-lift reveal">
         <div class="pixel-frame-inner terminal-body">
           <div class="progress-top">
-            <div class="raised-summary"><span class="raised" id="raised-amount">--</span><span class="raised-label">SOL raised</span></div>
-            <div class="goal mono">Target: <span id="goal-amount">30</span> SOL</div>
+            <div class="raised-summary"><span class="raised" id="available-batc">--</span><span class="raised-label">BATC available in this stage</span></div>
+            <div class="goal mono" id="stage-allocation">Current stage allocation: -- BATC</div>
           </div>
           <div class="progress-track" id="progress-track"></div>
           <div class="progress-meta">
-            <span><svg data-lucide="trending-up" class="icon"></svg> <span id="progress-pct">0</span>% Reached</span>
+            <span><svg data-lucide="trending-up" class="icon"></svg> <span id="progress-pct">0</span>% Sold</span>
             <span class="accent"><svg data-lucide="users" class="icon"></svg> <span id="participant-count">--</span> Participants</span>
           </div>
 
           <div class="stage-list" aria-label="Presale stages">
             <div class="stage stage-head" aria-hidden="true">
-              <span>Stage</span><span>Price (SOL)</span><span>BATC Sold</span><span>SOL Raised</span>
+              <span>Stage</span><span>Price (SOL)</span><span>BATC Sold</span><span>BATC Remaining</span>
             </div>
             <div class="stage active" data-stage-id="1">
               <span class="tag"><svg data-lucide="flame" class="icon"></svg>Stage 1</span>
               <span class="price" data-stage-price>$0.005</span>
               <span class="stage-value" data-stage-sold>--</span>
-              <span class="stage-value" data-stage-raised>--</span>
+              <span class="stage-value" data-stage-remaining>--</span>
             </div>
             <div class="stage" data-stage-id="2">
               <span class="tag"><svg data-lucide="lock" class="icon"></svg>Stage 2</span>
               <span class="price" data-stage-price>$0.006</span>
               <span class="stage-value" data-stage-sold>--</span>
-              <span class="stage-value" data-stage-raised>--</span>
+              <span class="stage-value" data-stage-remaining>--</span>
             </div>
             <div class="stage" data-stage-id="3">
               <span class="tag"><svg data-lucide="lock" class="icon"></svg>Stage 3</span>
               <span class="price" data-stage-price>$0.0075</span>
               <span class="stage-value" data-stage-sold>--</span>
-              <span class="stage-value" data-stage-raised>--</span>
+              <span class="stage-value" data-stage-remaining>--</span>
             </div>
             <div class="stage">
               <span class="tag"><svg data-lucide="rocket" class="icon"></svg>DEX Launch</span>
@@ -260,7 +260,7 @@
               <span class="stage-value">&mdash;</span>
             </div>
             <div class="stage stage-total">
-              <span>Total</span><span></span><span id="total-sold">--</span><span id="total-raised">--</span>
+              <span>Total</span><span></span><span id="total-sold">--</span><span id="total-available">--</span>
             </div>
           </div>
 
