@@ -277,7 +277,7 @@
   <form method="dialog" class="purchase-dialog-card pixel-frame">
     <div class="pixel-frame-inner">
       <div class="sec-tag"><svg data-lucide="shield-check" class="icon"></svg>Verify Transaction</div>
-      <h3 id="purchase-dialog-title">Review testnet purchase</h3>
+      <h3 id="purchase-dialog-title">Review devnet purchase</h3>
       <div class="purchase-summary" aria-label="Purchase summary">
         <div class="purchase-summary-item">
           <span>You pay</span>
@@ -291,15 +291,16 @@
       </div>
       <div class="purchase-details-head">
         <span>Transfer details</span>
-        <span>Testnet</span>
+        <span>Devnet</span>
       </div>
       <dl class="purchase-breakdown">
         <div><dt>Token price</dt><dd id="confirm-price">--</dd></div>
         <div><dt>Stage</dt><dd id="confirm-stage">--</dd></div>
-        <div><dt>Network</dt><dd>Solana testnet</dd></div>
+        <div><dt>Network</dt><dd>Solana devnet</dd></div>
         <div><dt>Treasury</dt><dd><button type="button" id="confirm-treasury" class="copy-address mono" title="Copy full treasury address">--</button></dd></div>
       </dl>
       <p class="dialog-note">Phantom will show the exact transfer before you sign. Network fees are additional.</p>
+      <p class="dialog-error" id="purchase-dialog-error" role="alert" hidden></p>
       <div class="dialog-actions">
         <button class="btn btn-ghost" value="cancel">Cancel</button>
         <button class="btn btn-primary" id="confirm-purchase" value="default" type="button">Confirm in Phantom</button>

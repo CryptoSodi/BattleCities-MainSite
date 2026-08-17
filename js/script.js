@@ -260,6 +260,12 @@ function setPurchaseStatus(message = '', type = 'info', link = null, linkLabel =
   }
 }
 
+function setPurchaseDialogError(message = ''){
+  const error = document.getElementById('purchase-dialog-error');
+  error.textContent = message;
+  error.hidden = !message;
+}
+
 function devnetExplorer(signature){
   return `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
 }
@@ -604,12 +610,23 @@ async function reviewPurchase(){
   });
   pendingQuote.walletAddress = connectedWallet;
   pendingQuoteSubmitted = false;
+  const transactionBytes = Uint8Array.from(
+    atob(pendingQuote.transaction),
+    character => character.charCodeAt(0),
+  );
+  pendingQuote.preparedTransaction = solanaWeb3.Transaction.from(transactionBytes);
+  const connection = new solanaWeb3.Connection(presaleState.rpcUrl, 'confirmed');
+  const simulation = await connection.simulateTransaction(pendingQuote.preparedTransaction);
+  if (simulation.value.err) {
+    throw new Error('The devnet transaction did not pass simulation. Check your balance and request a new quote.');
+  }
   document.getElementById('confirm-pay').textContent = `${pendingQuote.payAmount} ${pendingQuote.method}`;
   document.getElementById('confirm-receive').textContent = `${formatTokenAmount(pendingQuote.batcAmount, true)} BATC`;
   document.getElementById('confirm-price').textContent = formatQuoteTokenPrice(pendingQuote);
   document.getElementById('confirm-stage').textContent = pendingQuote.stageLabel;
   document.getElementById('confirm-treasury').textContent = truncateAddress(pendingQuote.treasury, 6);
   document.getElementById('confirm-treasury').title = pendingQuote.treasury;
+  setPurchaseDialogError();
   document.getElementById('purchase-dialog').showModal();
   setPurchaseStatus('Review the exact devnet transfer before signing.', 'info');
 }
@@ -623,12 +640,10 @@ async function submitPurchase(){
   confirmButton.setAttribute('aria-busy', 'true');
   confirmButton.textContent = 'Waiting for Phantom…';
   try {
-    const bytes = Uint8Array.from(atob(quote.transaction), character => character.charCodeAt(0));
-    const transaction = solanaWeb3.Transaction.from(bytes);
+    const transaction = quote.preparedTransaction;
+    if (!transaction) throw new Error('This quote is not ready. Close the dialog and request it again.');
     const connection = new solanaWeb3.Connection(presaleState.rpcUrl, 'confirmed');
-    const simulation = await connection.simulateTransaction(transaction);
-    if (simulation.value.err) throw new Error('The devnet transaction did not pass simulation. Check your balance and try again.');
-
+    setPurchaseDialogError();
     const { signature } = await phantomProvider.signAndSendTransaction(transaction);
     paymentSignature = signature;
     pendingQuoteSubmitted = true;
@@ -655,7 +670,9 @@ async function submitPurchase(){
     }
   } catch (error) {
     if (error.code === 4001) {
-      setPurchaseStatus('Transaction cancelled. No payment was sent.', 'info');
+      const message = 'Phantom cancelled the request. Unlock Phantom and try again; no payment was sent.';
+      setPurchaseDialogError(message);
+      setPurchaseStatus(message, 'info');
     } else if (paymentSignature) {
       pendingDeliveryRetry = { signature: paymentSignature, quoteToken: quote.quoteToken };
       updateProgressRow('payment', 'confirmed', 'SOL payment submitted; verification can be retried');
@@ -663,7 +680,10 @@ async function submitPurchase(){
       document.getElementById('retry-delivery').hidden = false;
       setPurchaseStatus('The SOL transaction was submitted. Retry verification before making another payment.', 'warning', devnetExplorer(paymentSignature), 'Payment transaction ↗');
     } else {
-      setPurchaseStatus(error.message || 'The transaction could not be completed.', 'error');
+      const message = error.message || 'Phantom did not receive the transaction. Unlock it and try again.';
+      setPurchaseDialogError(message);
+      setPurchaseStatus(message, 'error');
+      console.error('[presale] Phantom signing failed:', error);
     }
   } finally {
     confirmButton.disabled = false;
