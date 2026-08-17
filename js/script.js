@@ -191,6 +191,7 @@ let currentMethod = 'SOL';
 let phantomProvider = null;
 let connectedWallet = null;
 let pendingQuote = null;
+let pendingDeliveryRetry = null;
 let walletConnectionInFlight = false;
 let boundPhantomProvider = null;
 
@@ -265,6 +266,53 @@ function setPurchaseStatus(message = '', type = 'info', link = null, linkLabel =
     anchor.textContent = linkLabel;
     status.appendChild(anchor);
   }
+}
+
+function devnetExplorer(signature){
+  return `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
+}
+
+function showPurchaseProgress(paymentSignature){
+  document.getElementById('purchase-progress').hidden = false;
+  document.getElementById('payment-explorer-link').href = devnetExplorer(paymentSignature);
+  updateProgressRow('payment', 'pending', 'Waiting for devnet confirmation');
+  updateProgressRow('delivery', 'pending', 'Starts after payment verification');
+  document.getElementById('delivery-explorer-link').hidden = true;
+  document.getElementById('retry-delivery').hidden = true;
+}
+
+function updateProgressRow(kind, state, message){
+  const row = document.getElementById(`${kind}-progress-row`);
+  row.classList.remove('is-confirmed', 'is-pending', 'is-failed');
+  row.classList.add(`is-${state}`);
+  document.getElementById(`${kind}-progress-text`).textContent = message;
+}
+
+function renderDeliveryResult(purchase){
+  const deliveryLink = document.getElementById('delivery-explorer-link');
+  const retryButton = document.getElementById('retry-delivery');
+  if (purchase.deliveryStatus === 'delivered' && purchase.deliveryTransactionSignature) {
+    updateProgressRow('delivery', 'confirmed', 'BATC delivered to your wallet');
+    deliveryLink.href = devnetExplorer(purchase.deliveryTransactionSignature);
+    deliveryLink.hidden = false;
+    retryButton.hidden = true;
+    pendingDeliveryRetry = null;
+    return true;
+  }
+  updateProgressRow('delivery', 'failed', 'Delivery is pending. Your verified payment is safe.');
+  deliveryLink.hidden = true;
+  retryButton.hidden = false;
+  return false;
+}
+
+async function verifyAndDeliver(signature, quoteToken){
+  updateProgressRow('payment', 'confirmed', 'SOL payment confirmed');
+  updateProgressRow('delivery', 'pending', 'Creating your BATC token account and delivering tokens');
+  const response = await apiRequest('/api/presale/verify', {
+    method: 'POST',
+    body: JSON.stringify({ signature, quoteToken }),
+  });
+  return { delivered: renderDeliveryResult(response.purchase), response };
 }
 
 async function apiRequest(path, options = {}){
@@ -549,43 +597,55 @@ async function reviewPurchase(){
   document.getElementById('confirm-treasury').textContent = truncateAddress(pendingQuote.treasury, 6);
   document.getElementById('confirm-treasury').title = pendingQuote.treasury;
   document.getElementById('purchase-dialog').showModal();
-  setPurchaseStatus('Review the exact testnet transfer before signing.', 'info');
+  setPurchaseStatus('Review the exact devnet transfer before signing.', 'info');
 }
 
 async function submitPurchase(){
   if (!pendingQuote || !phantomProvider) return;
   const confirmButton = document.getElementById('confirm-purchase');
+  const quote = pendingQuote;
+  let paymentSignature = null;
   confirmButton.disabled = true;
   confirmButton.setAttribute('aria-busy', 'true');
   confirmButton.textContent = 'Waiting for Phantom…';
   try {
-    const bytes = Uint8Array.from(atob(pendingQuote.transaction), character => character.charCodeAt(0));
+    const bytes = Uint8Array.from(atob(quote.transaction), character => character.charCodeAt(0));
     const transaction = solanaWeb3.Transaction.from(bytes);
     const connection = new solanaWeb3.Connection(presaleState.rpcUrl, 'confirmed');
     const simulation = await connection.simulateTransaction(transaction);
-    if (simulation.value.err) throw new Error('The testnet transaction did not pass simulation. Check your balance and try again.');
+    if (simulation.value.err) throw new Error('The devnet transaction did not pass simulation. Check your balance and try again.');
 
     const { signature } = await phantomProvider.signAndSendTransaction(transaction);
+    paymentSignature = signature;
     document.getElementById('purchase-dialog').close();
-    const explorer = `https://explorer.solana.com/tx/${signature}?cluster=testnet`;
-    setPurchaseStatus('Transaction submitted. Waiting for testnet confirmation…', 'info', explorer);
+    const explorer = devnetExplorer(signature);
+    showPurchaseProgress(signature);
+    setPurchaseStatus('SOL payment submitted. Waiting for devnet confirmation…', 'info', explorer, 'Payment transaction ↗');
     await connection.confirmTransaction({
       signature,
-      blockhash: pendingQuote.blockhash,
-      lastValidBlockHeight: pendingQuote.lastValidBlockHeight,
+      blockhash: quote.blockhash,
+      lastValidBlockHeight: quote.lastValidBlockHeight,
     }, 'confirmed');
-    await apiRequest('/api/presale/verify', {
-      method: 'POST',
-      body: JSON.stringify({ signature, quoteToken: pendingQuote.quoteToken }),
-    });
+    pendingDeliveryRetry = { signature, quoteToken: quote.quoteToken };
+    const delivery = await verifyAndDeliver(signature, quote.quoteToken);
     document.getElementById('payAmount').value = '';
     animateReceiveTo(0);
-    pendingQuote = null;
     await refreshPresaleState({ quiet: true });
-    setPurchaseStatus('Payment confirmed. Your BATC allocation is recorded.', 'success', explorer);
+    if (delivery.delivered) {
+      pendingQuote = null;
+      setPurchaseStatus('Payment confirmed and BATC delivered.', 'success');
+    } else {
+      setPurchaseStatus('Payment confirmed. BATC delivery can be retried safely.', 'warning');
+    }
   } catch (error) {
     if (error.code === 4001) {
       setPurchaseStatus('Transaction cancelled. No payment was sent.', 'info');
+    } else if (paymentSignature) {
+      pendingDeliveryRetry = { signature: paymentSignature, quoteToken: quote.quoteToken };
+      updateProgressRow('payment', 'confirmed', 'SOL payment submitted; verification can be retried');
+      updateProgressRow('delivery', 'failed', 'Delivery has not completed yet');
+      document.getElementById('retry-delivery').hidden = false;
+      setPurchaseStatus('The SOL transaction was submitted. Retry verification before making another payment.', 'warning', devnetExplorer(paymentSignature), 'Payment transaction ↗');
     } else {
       setPurchaseStatus(error.message || 'The transaction could not be completed.', 'error');
     }
@@ -595,6 +655,33 @@ async function submitPurchase(){
     confirmButton.textContent = 'Confirm in Phantom';
   }
 }
+
+document.getElementById('retry-delivery').addEventListener('click', async () => {
+  if (!pendingDeliveryRetry) return;
+  const button = document.getElementById('retry-delivery');
+  button.disabled = true;
+  button.setAttribute('aria-busy', 'true');
+  updateProgressRow('delivery', 'pending', 'Checking the previous delivery before retrying');
+  try {
+    const result = await verifyAndDeliver(
+      pendingDeliveryRetry.signature,
+      pendingDeliveryRetry.quoteToken,
+    );
+    if (result.delivered) {
+      pendingQuote = null;
+      await refreshPresaleState({ quiet: true });
+      setPurchaseStatus('Payment confirmed and BATC delivered.', 'success');
+    } else {
+      setPurchaseStatus('BATC delivery is still pending. You can retry without another payment.', 'warning');
+    }
+  } catch (error) {
+    updateProgressRow('delivery', 'failed', 'Delivery retry did not complete');
+    setPurchaseStatus(`${error.message} Your payment record is preserved.`, 'error');
+  } finally {
+    button.disabled = false;
+    button.removeAttribute('aria-busy');
+  }
+});
 
 document.getElementById('confirm-purchase').addEventListener('click', submitPurchase);
 document.getElementById('copy-wallet').addEventListener('click', async () => {

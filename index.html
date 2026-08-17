@@ -302,7 +302,20 @@
 
         <button class="btn btn-primary buy-btn" id="buy-button" type="button" onclick="connectWallet()"><svg data-lucide="wallet" class="icon"></svg><span id="buy-button-label">Connect Phantom</span></button>
         <div class="purchase-status" id="purchase-status" role="status" aria-live="polite"></div>
-        <p class="buy-note"><svg data-lucide="triangle-alert" class="icon"></svg><span><b>TESTNET:</b> Enable testnet mode in Phantom. Payments use test assets and create a BATC allocation record; no BATC token is distributed yet.</span></p>
+        <div class="purchase-progress" id="purchase-progress" aria-live="polite" hidden>
+          <div class="purchase-progress-row" id="payment-progress-row">
+            <span class="purchase-progress-icon" aria-hidden="true">1</span>
+            <span><b>SOL payment</b><small id="payment-progress-text">Waiting for confirmation</small></span>
+            <a id="payment-explorer-link" target="_blank" rel="noreferrer">Explorer ↗</a>
+          </div>
+          <div class="purchase-progress-row" id="delivery-progress-row">
+            <span class="purchase-progress-icon" aria-hidden="true">2</span>
+            <span><b>BATC delivery</b><small id="delivery-progress-text">Starts after payment verification</small></span>
+            <a id="delivery-explorer-link" target="_blank" rel="noreferrer" hidden>Explorer ↗</a>
+            <button type="button" id="retry-delivery" hidden>Retry delivery</button>
+          </div>
+        </div>
+        <p class="buy-note"><svg data-lucide="triangle-alert" class="icon"></svg><span><b>DEVNET:</b> Enable devnet in Phantom. Confirmed SOL payments automatically deliver test BATC to the connected wallet.</span></p>
       </div>
     </div>
   </div>
@@ -401,7 +414,7 @@
         <span class="faq-q"><svg data-lucide="rocket" class="icon q-icon"></svg>What happens after the presale ends?</span>
         <svg data-lucide="chevron-down" class="icon chev"></svg>
       </summary>
-      <div class="faq-answer">Testnet payments create a verified BATC allocation for the connected Solana wallet. BATC is not minted or distributed yet; claim and distribution details will be published and independently reviewed before token launch.</div>
+      <div class="faq-answer">On devnet, the API verifies the confirmed SOL transfer, records the purchase, creates your Token-2022 account when needed, and delivers test BATC automatically. Payment and BATC delivery each have their own explorer transaction.</div>
     </details>
 
     <details class="faq-item" name="faq-group">
