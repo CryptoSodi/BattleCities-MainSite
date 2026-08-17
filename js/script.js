@@ -191,6 +191,7 @@ let currentMethod = 'SOL';
 let phantomProvider = null;
 let connectedWallet = null;
 let pendingQuote = null;
+let pendingQuoteSubmitted = false;
 let pendingDeliveryRetry = null;
 let walletConnectionInFlight = false;
 let boundPhantomProvider = null;
@@ -509,7 +510,6 @@ function updateWalletUi(publicKey){
 
 function resetWalletConnection(){
   connectedWallet = null;
-  pendingQuote = null;
   updateWalletUi(null);
   const button = document.getElementById('buy-button');
   button.disabled = !presaleState?.configured || presaleState?.ended;
@@ -570,6 +570,17 @@ async function connectWallet(){
 }
 
 async function reviewPurchase(){
+  try {
+    const trusted = await phantomProvider.connect({ onlyIfTrusted: true });
+    const trustedWallet = trusted?.publicKey || phantomProvider.publicKey;
+    if (!trustedWallet) throw new Error('Phantom is locked.');
+    updateWalletUi(trustedWallet);
+  } catch {
+    resetWalletConnection();
+    setPurchaseStatus('Unlock Phantom, then reconnect before requesting a quote.', 'warning');
+    return;
+  }
+
   const payAmount = document.getElementById('payAmount').value.trim();
   if (!payAmount || Number(payAmount) <= 0) {
     setPurchaseStatus('Enter the amount you want to pay first.', 'warning');
@@ -577,10 +588,22 @@ async function reviewPurchase(){
     return;
   }
   setPurchaseStatus('Creating a verified five-minute quote…', 'info');
+  const replaceQuoteToken = pendingQuote
+    && !pendingQuoteSubmitted
+    && pendingQuote.walletAddress === connectedWallet
+    ? pendingQuote.quoteToken
+    : undefined;
   pendingQuote = await apiRequest('/api/presale/quote', {
     method: 'POST',
-    body: JSON.stringify({ wallet: connectedWallet, method: currentMethod, payAmount }),
+    body: JSON.stringify({
+      wallet: connectedWallet,
+      method: currentMethod,
+      payAmount,
+      replaceQuoteToken,
+    }),
   });
+  pendingQuote.walletAddress = connectedWallet;
+  pendingQuoteSubmitted = false;
   document.getElementById('confirm-pay').textContent = `${pendingQuote.payAmount} ${pendingQuote.method}`;
   document.getElementById('confirm-receive').textContent = `${formatTokenAmount(pendingQuote.batcAmount, true)} BATC`;
   document.getElementById('confirm-price').textContent = formatQuoteTokenPrice(pendingQuote);
@@ -608,6 +631,7 @@ async function submitPurchase(){
 
     const { signature } = await phantomProvider.signAndSendTransaction(transaction);
     paymentSignature = signature;
+    pendingQuoteSubmitted = true;
     document.getElementById('purchase-dialog').close();
     const explorer = devnetExplorer(signature);
     showPurchaseProgress(signature);
@@ -624,6 +648,7 @@ async function submitPurchase(){
     await refreshPresaleState({ quiet: true });
     if (delivery.delivered) {
       pendingQuote = null;
+      pendingQuoteSubmitted = false;
       setPurchaseStatus('Payment confirmed and BATC delivered.', 'success');
     } else {
       setPurchaseStatus('Payment confirmed. BATC delivery can be retried safely.', 'warning');
@@ -660,6 +685,7 @@ document.getElementById('retry-delivery').addEventListener('click', async () => 
     );
     if (result.delivered) {
       pendingQuote = null;
+      pendingQuoteSubmitted = false;
       await refreshPresaleState({ quiet: true });
       setPurchaseStatus('Payment confirmed and BATC delivered.', 'success');
     } else {
