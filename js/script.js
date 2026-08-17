@@ -348,7 +348,9 @@ function renderQuickAmounts(){
           if (!connectedWallet) throw new Error('Connect Phantom to load your testnet balance.');
           const connection = new solanaWeb3.Connection(presaleState.rpcUrl, 'confirmed');
           const lamports = await connection.getBalance(new solanaWeb3.PublicKey(connectedWallet), 'confirmed');
-          value = Math.max(0, (lamports - 10000000) / solanaWeb3.LAMPORTS_PER_SOL).toFixed(4);
+          const walletMax = Math.max(0, (lamports - 10000000) / solanaWeb3.LAMPORTS_PER_SOL);
+          const saleMax = safeNumber(presaleState?.maxPaySol) || 0;
+          value = Math.min(walletMax, saleMax).toFixed(9).replace(/\.?(0+)$/, '');
         }
         document.getElementById('payAmount').value = value;
         wrap.querySelectorAll('.quick-amt').forEach(button => button.classList.remove('active'));
@@ -411,7 +413,13 @@ function animateReceiveTo(target){
 // Recalculate "You Receive" based on the current "You Pay" input + selected rate,
 // and briefly flash the input box border to give feedback that the value changed
 function calc(){
-  const pay = parseFloat(document.getElementById('payAmount').value) || 0;
+  const payInput = document.getElementById('payAmount');
+  let pay = parseFloat(payInput.value) || 0;
+  const maxPay = safeNumber(presaleState?.maxPaySol) || 0;
+  if (maxPay > 0 && pay > maxPay) {
+    pay = maxPay;
+    payInput.value = formatSol(maxPay);
+  }
   const price = safeNumber(presaleState?.currentPriceSol);
   const target = price ? pay / price : 0;
   animateReceiveTo(target);
