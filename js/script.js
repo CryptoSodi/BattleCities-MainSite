@@ -199,6 +199,14 @@ const quickAmountPresets = {
   USDC: [{ label: '100 USDC', value: 100 }, { label: '250 USDC', value: 250 }],
 };
 
+// Fixed SOL price for each public presale stage. Quotes reference a stage ID,
+// so the review dialog can always show the exact stage price before signing.
+const stagePricesSol = Object.freeze({
+  1: '0.00004',
+  2: '0.000066667',
+  3: '0.00008',
+});
+
 function safeNumber(value){
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
@@ -226,11 +234,15 @@ function formatTokenAmount(value, detailed = false){
   }).format(number);
 }
 
-function formatTokenPrice(value){
-  const number = safeNumber(value);
-  if (number === null) return '--';
-  if (number === 0) return '$0.00';
-  return `$${number.toLocaleString('en-US', { maximumFractionDigits: 8 })}`;
+function formatQuoteTokenPrice(quote){
+  const stagePrice = stagePricesSol[quote.stageId];
+  if (stagePrice) return `${formatSol(stagePrice)} SOL`;
+
+  const payAmount = safeNumber(quote.payAmount);
+  const batcAmount = safeNumber(quote.batcAmount);
+  return payAmount !== null && batcAmount > 0
+    ? `${formatSol(payAmount / batcAmount)} SOL`
+    : '--';
 }
 
 function truncateAddress(address, chars = 4){
@@ -532,7 +544,7 @@ async function reviewPurchase(){
   });
   document.getElementById('confirm-pay').textContent = `${pendingQuote.payAmount} ${pendingQuote.method}`;
   document.getElementById('confirm-receive').textContent = `${formatTokenAmount(pendingQuote.batcAmount, true)} BATC`;
-  document.getElementById('confirm-price').textContent = formatTokenPrice(pendingQuote.tokenPriceUsd);
+  document.getElementById('confirm-price').textContent = formatQuoteTokenPrice(pendingQuote);
   document.getElementById('confirm-stage').textContent = pendingQuote.stageLabel;
   document.getElementById('confirm-treasury').textContent = truncateAddress(pendingQuote.treasury, 6);
   document.getElementById('confirm-treasury').title = pendingQuote.treasury;
