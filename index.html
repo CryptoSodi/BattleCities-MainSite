@@ -313,9 +313,22 @@
     <div class="pixel-frame-inner">
       <div class="sec-tag"><svg data-lucide="shield-check" class="icon"></svg>Verify Transaction</div>
       <h3 id="purchase-dialog-title">Review testnet purchase</h3>
+      <div class="purchase-summary" aria-label="Purchase summary">
+        <div class="purchase-summary-item">
+          <span>You pay</span>
+          <strong id="confirm-pay">--</strong>
+        </div>
+        <span class="purchase-summary-divider" aria-hidden="true"></span>
+        <div class="purchase-summary-item is-allocation">
+          <span>You receive</span>
+          <strong id="confirm-receive">--</strong>
+        </div>
+      </div>
+      <div class="purchase-details-head">
+        <span>Transfer details</span>
+        <span>Testnet</span>
+      </div>
       <dl class="purchase-breakdown">
-        <div><dt>You pay</dt><dd id="confirm-pay">--</dd></div>
-        <div><dt>Allocation</dt><dd id="confirm-receive">--</dd></div>
         <div><dt>Token price</dt><dd id="confirm-price">--</dd></div>
         <div><dt>Stage</dt><dd id="confirm-stage">--</dd></div>
         <div><dt>Network</dt><dd>Solana testnet</dd></div>
@@ -324,7 +337,7 @@
       <p class="dialog-note">Phantom will show the exact transfer before you sign. Network fees are additional.</p>
       <div class="dialog-actions">
         <button class="btn btn-ghost" value="cancel">Cancel</button>
-        <button class="btn btn-primary" id="confirm-purchase" value="default" type="button">Sign in Phantom</button>
+        <button class="btn btn-primary" id="confirm-purchase" value="default" type="button">Confirm in Phantom</button>
       </div>
     </div>
   </form>

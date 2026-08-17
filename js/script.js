@@ -569,7 +569,7 @@ async function submitPurchase(){
   } finally {
     confirmButton.disabled = false;
     confirmButton.removeAttribute('aria-busy');
-    confirmButton.textContent = 'Sign in Phantom';
+    confirmButton.textContent = 'Confirm in Phantom';
   }
 }
 
