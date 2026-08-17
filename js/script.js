@@ -727,20 +727,6 @@ window.addEventListener('load', async () => {
   } catch {}
 });
 
-// Notify-me form — front-end only for this static demo. Wire this up to
-// a real mailing-list endpoint (Mailchimp, backend API, etc.) to actually
-// store submitted addresses.
-function subscribeEmail(event){
-  event.preventDefault();
-  const input = document.getElementById('notifyEmail');
-  const status = document.getElementById('notifyStatus');
-  const email = input.value.trim();
-  if(!email) return false;
-  status.innerHTML = `You're on the list — we'll email <b style="color:var(--white)">${email}</b> at launch.`;
-  input.value = '';
-  return false;
-}
-
 // Initialize Lucide icons once the DOM (and again once all assets) has loaded
 window.addEventListener('DOMContentLoaded', () => {
   if (window.lucide) lucide.createIcons();
