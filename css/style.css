@@ -226,6 +226,17 @@ section{position:relative;z-index:1;padding:70px 5% 90px;scroll-margin-top:var(-
 .eyebrow .pulse{width:7px;height:7px;background:var(--neon);box-shadow:0 0 10px var(--neon-glow);animation:blink 1.2s infinite;}
 @keyframes blink{50%{opacity:.15;}}
 
+.hero-game-logo{
+  display:block;width:min(310px,58%);height:auto;margin:0 0 18px;
+  filter:drop-shadow(0 14px 22px rgba(0,0,0,.48));
+}
+@media(prefers-reduced-motion:no-preference){
+  .hero-game-logo{animation:floatY 6.2s ease-in-out infinite;}
+}
+@media(max-width:760px){
+  .hero-game-logo{width:min(250px,68%);margin:0 auto 18px;}
+}
+
 .hero h1{
   font-family:'Press Start 2P',monospace;
   font-size:clamp(30px,6.4vw,74px);
