@@ -14,7 +14,10 @@ let presaleRefreshTimer = null;
 // 1080ms arrive at the requested game or site route
 const DEPLOYMENT_TIMING = {
   handoff: 1080,
+  pageHandoff: 500,
 };
+
+const DEPLOYMENT_ARRIVAL_KEY = 'battlecities:deployment-arrival';
 
 let deploymentInProgress = false;
 let deploymentTimer = null;
@@ -25,34 +28,48 @@ function resetDeployment(){
   deploymentTimer = null;
   deploymentInProgress = false;
   if (!overlay) return;
-  overlay.classList.remove('is-active');
+  overlay.classList.remove('is-active', 'is-departing');
   overlay.setAttribute('aria-hidden', 'true');
 }
 
 // Reusable game/page handoff. Add data-deployment-url to any future route that
 // should show the elevator deployment sequence before navigation.
 function beginDeployment(event){
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
   event.preventDefault();
   if (deploymentInProgress) return;
   const destination = event.currentTarget.dataset.deploymentUrl || event.currentTarget.href;
   const overlay = document.getElementById('deploymentOverlay');
   const sector = event.currentTarget.dataset.deploymentSector || '01';
+  const arrival = event.currentTarget.dataset.deploymentArrival || '';
+  const deploymentLabel = event.currentTarget.dataset.deploymentLabel || '';
   const sectorLabel = document.getElementById('deploymentSector');
   if (!overlay || !destination) {
     window.location.assign(destination);
     return;
   }
-  sectorLabel.textContent = `SECTOR ${sector.padStart(2, '0')}`;
+  sectorLabel.textContent = deploymentLabel || `SECTOR ${sector.padStart(2, '0')}`;
   deploymentInProgress = true;
   overlay.setAttribute('aria-hidden', 'false');
 
   // The site can return from the game through the browser's back-forward
   // cache. Removing the class and forcing one layout read resets every CSS
   // keyframe so the same transition plays on every Play click.
-  overlay.classList.remove('is-active');
+  overlay.classList.remove('is-active', 'is-departing');
   void overlay.offsetWidth;
-  overlay.classList.add('is-active');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (arrival) {
+    try { window.sessionStorage.setItem(DEPLOYMENT_ARRIVAL_KEY, arrival); } catch {}
+    overlay.classList.add('is-departing');
+    deploymentTimer = window.setTimeout(
+      () => window.location.assign(destination),
+      reducedMotion ? 0 : DEPLOYMENT_TIMING.pageHandoff
+    );
+    return;
+  }
+
+  overlay.classList.add('is-active');
   deploymentTimer = window.setTimeout(
     () => window.location.assign(destination),
     reducedMotion ? 0 : DEPLOYMENT_TIMING.handoff

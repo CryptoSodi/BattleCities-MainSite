@@ -15,6 +15,28 @@ const TIMING = {
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 document.documentElement.style.setProperty('--wp-reveal-duration', `${TIMING.revealDuration}ms`);
 
+const deploymentOverlay = document.getElementById('deploymentOverlay');
+const hasDeploymentArrival = document.documentElement.classList.contains('deployment-arrival');
+
+function finishDeploymentArrival() {
+  deploymentOverlay?.classList.remove('is-arriving');
+  deploymentOverlay?.setAttribute('aria-hidden', 'true');
+  document.documentElement.classList.remove('deployment-arrival');
+}
+
+if (hasDeploymentArrival) {
+  try { window.sessionStorage.removeItem('battlecities:deployment-arrival'); } catch {}
+  if (reducedMotion || !deploymentOverlay) {
+    finishDeploymentArrival();
+  } else {
+    deploymentOverlay.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(() => {
+      deploymentOverlay.classList.add('is-arriving');
+      window.setTimeout(finishDeploymentArrival, 500);
+    });
+  }
+}
+
 const revealTargets = document.querySelectorAll(
   '.wp-hero-brand, .wp-kicker, .wp-hero h1, .wp-lede, .wp-actions, .wp-brief, .wp-section .sec-tag, .wp-section h2, .wp-section-intro, .wp-toc-grid, .wp-formula, .wp-feature-grid article, .wp-table-wrap, .wp-note, .wp-powerups-head, .wp-powerup-grid article, .wp-economy-flow, .wp-reward-card, .wp-disclaimer, .tokenomics .pixel-frame, .tokenomics .alloc-list, .whitepaper-roadmap .timeline-list, .wp-disclosure-grid',
 );
