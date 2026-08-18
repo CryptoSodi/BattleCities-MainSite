@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Battle Cities Whitepaper v0.4 - game utility, competitive rewards, tokenomics, and transparency commitments for BATC.">
 <title>Whitepaper v0.4 | Battle Cities</title>
-<link rel="icon" href="images/favicon.png" type="image/png">
+<link rel="icon" href="images/battle-cities-mark.png" type="image/png">
 <script>
 document.documentElement.classList.add('has-js');
 try {
@@ -17,10 +17,10 @@ try {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Chakra+Petch:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=20260818-whitepaper-lift">
+<link rel="stylesheet" href="css/style.css?v=20260818-shared-brand">
 <link rel="stylesheet" href="css/whitepaper.css?v=20260818-v06-hover">
 <script src="https://unpkg.com/lucide@latest" defer></script>
-<script src="js/whitepaper.js?v=20260818-whitepaper-lift" defer></script>
+<script src="js/whitepaper.js?v=20260818-bidirectional-lift" defer></script>
 </head>
 <body class="whitepaper-page">
 <div class="grid-bg"></div>
@@ -29,22 +29,22 @@ try {
   <div class="deployment-door deployment-door-left" aria-hidden="true"><i></i></div>
   <div class="deployment-door deployment-door-right" aria-hidden="true"><i></i></div>
   <div class="deployment-readout" role="status" aria-live="polite">
-    <small>DOCUMENT ACCESS // SECURE CHANNEL</small>
-    <b>OPENING ARCHIVE</b>
-    <strong>WHITEPAPER v0.4</strong>
+    <small id="deploymentEyebrow">DOCUMENT ACCESS // SECURE CHANNEL</small>
+    <b id="deploymentTitle">OPENING ARCHIVE</b>
+    <strong id="deploymentSector">WHITEPAPER v0.4</strong>
     <i aria-hidden="true"><em></em></i>
-    <span>WHITEPAPER ONLINE // DATA READY</span>
+    <span id="deploymentStatus">WHITEPAPER ONLINE // DATA READY</span>
   </div>
 </div>
 
 <nav aria-label="Primary navigation">
   <div class="nav-inner">
-    <a class="wp-brand" href="index.html" aria-label="Battle Cities home">
-      <span class="logo-box pixel-frame"><span class="pixel-frame-inner"><img class="coin-logo" src="images/coin logo.png" alt=""></span></span>
+    <a class="wp-brand" href="index.html" aria-label="Battle Cities home" data-deployment-url="index.html" data-deployment-arrival="main" data-deployment-label="MAIN SITE">
+      <span class="logo-box pixel-frame"><span class="pixel-frame-inner"><img class="coin-logo" src="images/battle-cities-mark.png" alt=""></span></span>
       <span class="logo-text"><span class="glitch" data-text="BATTLE">BATTLE</span> <span class="brand-cities">CITIES</span></span>
     </a>
     <div class="navlinks">
-      <a href="index.html"><svg data-lucide="home" class="icon" aria-hidden="true"></svg>Home</a>
+      <a href="index.html" data-deployment-url="index.html" data-deployment-arrival="main" data-deployment-label="MAIN SITE"><svg data-lucide="home" class="icon" aria-hidden="true"></svg>Home</a>
       <a href="#tokenomics"><svg data-lucide="pie-chart" class="icon" aria-hidden="true"></svg>Tokenomics</a>
       <a href="#roadmap"><svg data-lucide="calendar-clock" class="icon" aria-hidden="true"></svg>Roadmap</a>
     </div>

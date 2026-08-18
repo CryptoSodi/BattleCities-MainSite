@@ -142,6 +142,7 @@ nav{
 .presence-round{color:var(--neon);}
 .presence-divider{color:var(--shop-button-edge);}
 .logo{display:flex;align-items:center;gap:12px;}
+.main-brand{flex-shrink:0;}
 .logo-box{width:38px;height:38px;}
 .logo-box .pixel-frame-inner{display:flex;align-items:center;justify-content:center;}
 .logo-box .coin-logo{display:block;width:100%;height:100%;object-fit:contain;}
@@ -157,6 +158,16 @@ nav{
   box-shadow:4px 4px 0 #000;transition:.15s;display:flex;align-items:center;gap:8px;
 }
 .navcta:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 #000;}
+@media(max-width:1280px){
+  .presence-hud{display:none;}
+}
+@media(max-width:900px){
+  .navlinks{gap:14px;font-size:10px;}
+  .main-brand{gap:8px;}
+  .main-brand .logo-box{width:34px;height:34px;}
+  .main-brand .logo-text{font-size:11px;}
+  .navcta{padding:9px 12px;}
+}
 
 /* Hazard bar: sits at the seam between hero and tokenomics instead of
    between the fixed nav and hero (which used to push the hero content down

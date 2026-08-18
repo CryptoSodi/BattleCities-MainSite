@@ -21,6 +21,28 @@ const DEPLOYMENT_ARRIVAL_KEY = 'battlecities:deployment-arrival';
 
 let deploymentInProgress = false;
 let deploymentTimer = null;
+const deploymentOverlay = document.getElementById('deploymentOverlay');
+const hasDeploymentArrival = document.documentElement.classList.contains('deployment-arrival');
+
+function finishDeploymentArrival(){
+  deploymentOverlay?.classList.remove('is-arriving');
+  deploymentOverlay?.setAttribute('aria-hidden', 'true');
+  document.documentElement.classList.remove('deployment-arrival');
+}
+
+if (hasDeploymentArrival) {
+  try { window.sessionStorage.removeItem(DEPLOYMENT_ARRIVAL_KEY); } catch {}
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reducedMotion || !deploymentOverlay) {
+    finishDeploymentArrival();
+  } else {
+    deploymentOverlay.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(() => {
+      deploymentOverlay.classList.add('is-arriving');
+      window.setTimeout(finishDeploymentArrival, 500);
+    });
+  }
+}
 
 function resetDeployment(){
   const overlay = document.getElementById('deploymentOverlay');
@@ -28,8 +50,9 @@ function resetDeployment(){
   deploymentTimer = null;
   deploymentInProgress = false;
   if (!overlay) return;
-  overlay.classList.remove('is-active', 'is-departing');
+  overlay.classList.remove('is-active', 'is-departing', 'is-arriving');
   overlay.setAttribute('aria-hidden', 'true');
+  document.documentElement.classList.remove('deployment-arrival');
 }
 
 // Reusable game/page handoff. Add data-deployment-url to any future route that
@@ -44,11 +67,23 @@ function beginDeployment(event){
   const arrival = event.currentTarget.dataset.deploymentArrival || '';
   const deploymentLabel = event.currentTarget.dataset.deploymentLabel || '';
   const sectorLabel = document.getElementById('deploymentSector');
+  const eyebrowLabel = document.getElementById('deploymentEyebrow');
+  const titleLabel = document.getElementById('deploymentTitle');
+  const statusLabel = document.getElementById('deploymentStatus');
   if (!overlay || !destination) {
     window.location.assign(destination);
     return;
   }
   sectorLabel.textContent = deploymentLabel || `SECTOR ${sector.padStart(2, '0')}`;
+  if (arrival === 'whitepaper') {
+    eyebrowLabel.textContent = 'DOCUMENT ACCESS // SECURE CHANNEL';
+    titleLabel.textContent = 'OPENING ARCHIVE';
+    statusLabel.textContent = 'WHITEPAPER ONLINE // DATA READY';
+  } else {
+    eyebrowLabel.textContent = 'DEPLOYING // BATTLEFIELD SEQUENCE';
+    titleLabel.textContent = 'ENTERING BATTLEFIELD';
+    statusLabel.textContent = 'SYSTEMS ONLINE // ARMOR READY';
+  }
   deploymentInProgress = true;
   overlay.setAttribute('aria-hidden', 'false');
 
@@ -82,7 +117,9 @@ document.querySelectorAll('[data-deployment-url]').forEach(link => {
 
 // pageshow also fires when restoring this page from bfcache after the user
 // returns from the game. The animation must be idle before its next replay.
-window.addEventListener('pageshow', resetDeployment);
+window.addEventListener('pageshow', () => {
+  if (!document.documentElement.classList.contains('deployment-arrival')) resetDeployment();
+});
 
 // Public game presence: authenticated players send heartbeats in the game;
 // this website only reads the aggregate count and never sends credentials.

@@ -17,6 +17,10 @@ document.documentElement.style.setProperty('--wp-reveal-duration', `${TIMING.rev
 
 const deploymentOverlay = document.getElementById('deploymentOverlay');
 const hasDeploymentArrival = document.documentElement.classList.contains('deployment-arrival');
+const DEPLOYMENT_ARRIVAL_KEY = 'battlecities:deployment-arrival';
+const PAGE_HANDOFF_DURATION = 500;
+let pageDeploymentInProgress = false;
+let pageDeploymentTimer = null;
 
 function finishDeploymentArrival() {
   deploymentOverlay?.classList.remove('is-arriving');
@@ -25,7 +29,7 @@ function finishDeploymentArrival() {
 }
 
 if (hasDeploymentArrival) {
-  try { window.sessionStorage.removeItem('battlecities:deployment-arrival'); } catch {}
+  try { window.sessionStorage.removeItem(DEPLOYMENT_ARRIVAL_KEY); } catch {}
   if (reducedMotion || !deploymentOverlay) {
     finishDeploymentArrival();
   } else {
@@ -36,6 +40,50 @@ if (hasDeploymentArrival) {
     });
   }
 }
+
+function beginPageDeployment(event) {
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  if (pageDeploymentInProgress) return;
+
+  const destination = event.currentTarget.dataset.deploymentUrl || event.currentTarget.href;
+  const arrival = event.currentTarget.dataset.deploymentArrival || '';
+  const deploymentLabel = event.currentTarget.dataset.deploymentLabel || 'MAIN SITE';
+  if (!deploymentOverlay || !destination) {
+    window.location.assign(destination);
+    return;
+  }
+
+  pageDeploymentInProgress = true;
+  document.getElementById('deploymentEyebrow').textContent = 'DEPLOYING // BATTLEFIELD SEQUENCE';
+  document.getElementById('deploymentTitle').textContent = 'RETURNING TO BATTLEFIELD';
+  document.getElementById('deploymentSector').textContent = deploymentLabel;
+  document.getElementById('deploymentStatus').textContent = 'SYSTEMS ONLINE // ARMOR READY';
+  try { window.sessionStorage.setItem(DEPLOYMENT_ARRIVAL_KEY, arrival); } catch {}
+
+  deploymentOverlay.setAttribute('aria-hidden', 'false');
+  deploymentOverlay.classList.remove('is-arriving', 'is-departing');
+  document.documentElement.classList.remove('deployment-arrival');
+  void deploymentOverlay.offsetWidth;
+  deploymentOverlay.classList.add('is-departing');
+  pageDeploymentTimer = window.setTimeout(
+    () => window.location.assign(destination),
+    reducedMotion ? 0 : PAGE_HANDOFF_DURATION
+  );
+}
+
+document.querySelectorAll('[data-deployment-url]').forEach(link => {
+  link.addEventListener('click', beginPageDeployment);
+});
+
+window.addEventListener('pageshow', () => {
+  if (document.documentElement.classList.contains('deployment-arrival')) return;
+  if (pageDeploymentTimer) window.clearTimeout(pageDeploymentTimer);
+  pageDeploymentTimer = null;
+  pageDeploymentInProgress = false;
+  deploymentOverlay?.classList.remove('is-departing');
+  deploymentOverlay?.setAttribute('aria-hidden', 'true');
+});
 
 const revealTargets = document.querySelectorAll(
   '.wp-hero-brand, .wp-kicker, .wp-hero h1, .wp-lede, .wp-actions, .wp-brief, .wp-section .sec-tag, .wp-section h2, .wp-section-intro, .wp-toc-grid, .wp-formula, .wp-feature-grid article, .wp-table-wrap, .wp-note, .wp-powerups-head, .wp-powerup-grid article, .wp-economy-flow, .wp-reward-card, .wp-disclaimer, .tokenomics .pixel-frame, .tokenomics .alloc-list, .whitepaper-roadmap .timeline-list, .wp-disclosure-grid',

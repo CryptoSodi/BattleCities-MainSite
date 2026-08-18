@@ -5,9 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="presale-api-base" content="https://api.battlecities.com">
 <title>BATTLE CITIES</title>
+<script>
+try {
+  if (sessionStorage.getItem('battlecities:deployment-arrival') === 'main') {
+    document.documentElement.classList.add('deployment-arrival');
+  }
+} catch {}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Chakra+Petch:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<link rel="icon" href="images/favicon.png" type="image/png">
+<link rel="icon" href="images/battle-cities-mark.png" type="image/png">
 <!-- External libraries: icon set + smooth-scroll -->
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
 <script src="js/vendor/cherry-embed-sdk-0.1.6.js" defer></script>
@@ -15,16 +22,32 @@
 <script src="js/vendor/ScrollTrigger.min.js" defer></script>
 <script src="js/vendor/solana-web3.min.js" defer></script>
 <!-- Page styles, moved out into its own file -->
-<link rel="stylesheet" href="css/style.css?v=20260818-main-hero-logo">
+<link rel="stylesheet" href="css/style.css?v=20260818-shared-brand">
 </head>
 <body>
 
 <!-- Fixed full-page decorative grid background -->
 <div class="grid-bg"></div>
 
+<div class="deployment-overlay" id="deploymentOverlay" aria-hidden="true">
+  <div class="deployment-door deployment-door-left" aria-hidden="true"><i></i></div>
+  <div class="deployment-door deployment-door-right" aria-hidden="true"><i></i></div>
+  <div class="deployment-readout" role="status" aria-live="assertive">
+    <small id="deploymentEyebrow">DEPLOYING // BATTLEFIELD SEQUENCE</small>
+    <b id="deploymentTitle">ENTERING BATTLEFIELD</b>
+    <strong id="deploymentSector">SECTOR 01</strong>
+    <i aria-hidden="true"><em></em></i>
+    <span id="deploymentStatus">SYSTEMS ONLINE // ARMOR READY</span>
+  </div>
+</div>
+
 <!-- ================= TOP NAVBAR (desktop) ================= -->
 <nav>
   <div class="nav-inner">
+    <a class="logo main-brand" href="#hero" aria-label="Battle Cities home">
+      <span class="logo-box pixel-frame"><span class="pixel-frame-inner"><img class="coin-logo" src="images/battle-cities-mark.png" alt=""></span></span>
+      <span class="logo-text"><span class="glitch" data-text="BATTLE">BATTLE</span> <span class="brand-cities">CITIES</span></span>
+    </a>
     <div class="navlinks">
       <a href="#hero"><svg data-lucide="home" class="icon"></svg>Home</a>
       <a href="#tokenomics"><svg data-lucide="pie-chart" class="icon"></svg>Token</a>
@@ -482,22 +505,9 @@
   </button>
 </div>
 
-<!-- Deployment transition reused before opening the game or any future page route. -->
-<div class="deployment-overlay" id="deploymentOverlay" aria-hidden="true">
-  <div class="deployment-door deployment-door-left" aria-hidden="true"><i></i></div>
-  <div class="deployment-door deployment-door-right" aria-hidden="true"><i></i></div>
-  <div class="deployment-readout" role="status" aria-live="assertive">
-    <small>DEPLOYING // BATTLEFIELD SEQUENCE</small>
-    <b>ENTERING BATTLEFIELD</b>
-    <strong id="deploymentSector">SECTOR 01</strong>
-    <i aria-hidden="true"><em></em></i>
-    <span>SYSTEMS ONLINE // ARMOR READY</span>
-  </div>
-</div>
-
 <!-- Page logic, moved out into its own file. Placed at the end of <body> so
      all the elements above already exist in the DOM when it runs. -->
-<script src="js/script.js?v=20260818-whitepaper-lift"></script>
+<script src="js/script.js?v=20260818-bidirectional-lift"></script>
 <script>
 document.addEventListener('contextmenu', e => e.preventDefault());
 
