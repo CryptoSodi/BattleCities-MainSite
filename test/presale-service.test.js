@@ -33,7 +33,8 @@ test('quote tokens detect tampering', () => {
 test('SOL quotes are derived from the active stage and signed by the backend', async () => {
   const secret = 'test-secret-that-is-at-least-32-characters';
   const config = loadConfig({
-    PRESALE_NETWORK: 'testnet',
+    PRESALE_NETWORK: 'mainnet-beta',
+    SOLANA_RPC_URL: 'https://mainnet.example.invalid',
     PRESALE_TREASURY_ADDRESS: '2nr1bHFT86W9tGnyvmYW4vcHKsQB3sVQfnddasz4kExM',
     PRESALE_QUOTE_SECRET: secret,
     PRESALE_END_AT: '2099-01-01T00:00:00.000Z',

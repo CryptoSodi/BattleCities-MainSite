@@ -125,7 +125,7 @@
           <div class="info-row"><span class="k"><svg data-lucide="link" class="icon"></svg>Standard</span><span class="v">SPL Token (Solana)</span></div>
           <div class="info-row"><span class="k"><svg data-lucide="coins" class="icon"></svg>Total Supply</span><span class="v">50,000,000 BATC</span></div>
           <div class="info-row"><span class="k"><svg data-lucide="gamepad-2" class="icon"></svg>Utility</span><span class="v accent">In-game Economy</span></div>
-          <div class="info-row"><span class="k"><svg data-lucide="lock" class="icon"></svg>Network</span><span class="v">Solana Testnet</span></div>
+          <div class="info-row"><span class="k"><svg data-lucide="lock" class="icon"></svg>Network</span><span class="v">Solana Mainnet</span></div>
           <div class="info-row"><span class="k"><svg data-lucide="shield-check" class="icon"></svg>Token Mint</span><span class="v accent">Published At Launch</span></div>
         </div>
       </div>
@@ -260,14 +260,13 @@
             <span><b>SOL payment</b><small id="payment-progress-text">Waiting for confirmation</small></span>
             <a id="payment-explorer-link" target="_blank" rel="noreferrer">Explorer ↗</a>
           </div>
-          <div class="purchase-progress-row" id="delivery-progress-row">
+          <div class="purchase-progress-row" id="allocation-progress-row">
             <span class="purchase-progress-icon" aria-hidden="true">2</span>
-            <span><b>BATC delivery</b><small id="delivery-progress-text">Starts after payment verification</small></span>
-            <a id="delivery-explorer-link" target="_blank" rel="noreferrer" hidden>Explorer ↗</a>
-            <button type="button" id="retry-delivery" hidden>Retry delivery</button>
+            <span><b>Allocation record</b><small id="allocation-progress-text">Recorded after payment verification</small></span>
+            <button type="button" id="retry-allocation" hidden>Retry verification</button>
           </div>
         </div>
-        <p class="buy-note"><svg data-lucide="triangle-alert" class="icon"></svg><span><b>DEVNET:</b> Enable devnet in Phantom. Confirmed SOL payments automatically deliver test BATC to the connected wallet.</span></p>
+        <p class="buy-note"><svg data-lucide="triangle-alert" class="icon"></svg><span><b>MAINNET:</b> Review the wallet, amount, and network before confirming. Verified payments are recorded against your BATC allocation.</span></p>
       </div>
     </div>
   </div>
@@ -277,7 +276,7 @@
   <form method="dialog" class="purchase-dialog-card pixel-frame">
     <div class="pixel-frame-inner">
       <div class="sec-tag"><svg data-lucide="shield-check" class="icon"></svg>Verify Transaction</div>
-      <h3 id="purchase-dialog-title">Review devnet purchase</h3>
+      <h3 id="purchase-dialog-title">Review mainnet purchase</h3>
       <div class="purchase-summary" aria-label="Purchase summary">
         <div class="purchase-summary-item">
           <span>You pay</span>
@@ -291,12 +290,12 @@
       </div>
       <div class="purchase-details-head">
         <span>Transfer details</span>
-        <span>Devnet</span>
+        <span>Mainnet</span>
       </div>
       <dl class="purchase-breakdown">
         <div><dt>Token price</dt><dd id="confirm-price">--</dd></div>
         <div><dt>Stage</dt><dd id="confirm-stage">--</dd></div>
-        <div><dt>Network</dt><dd>Solana devnet</dd></div>
+        <div><dt>Network</dt><dd>Solana Mainnet</dd></div>
         <div><dt>Treasury</dt><dd><button type="button" id="confirm-treasury" class="copy-address mono" title="Copy full treasury address">--</button></dd></div>
       </dl>
       <p class="dialog-note">Phantom will show the exact transfer before you sign. Network fees are additional.</p>
@@ -346,7 +345,7 @@
       <div class="tl-marker mono">Jun–Jul 2026</div>
       <div class="tl-body">
         <h3><svg data-lucide="shield-check" class="icon"></svg>Presale Readiness</h3>
-        <p>Wallet flows, allocation tooling, and testnet settlement are validated ahead of the public presale.</p>
+        <p>Wallet flows, allocation tooling, and settlement are validated ahead of the public presale.</p>
       </div>
     </div>
     <div class="tl-item now reveal">
@@ -423,7 +422,7 @@
         <span class="faq-q"><svg data-lucide="rocket" class="icon q-icon"></svg>What happens after the presale ends?</span>
         <svg data-lucide="chevron-down" class="icon chev"></svg>
       </summary>
-      <div class="faq-answer">On devnet, the API verifies the confirmed SOL transfer, records the purchase, creates your Token-2022 account when needed, and delivers test BATC automatically. Payment and BATC delivery each have their own explorer transaction.</div>
+      <div class="faq-answer">The API verifies the confirmed SOL transfer and records your BATC allocation. Keep your payment transaction signature for your records and follow official BattleCities channels for distribution updates.</div>
     </details>
 
     <details class="faq-item" name="faq-group">

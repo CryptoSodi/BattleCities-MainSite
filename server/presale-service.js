@@ -122,7 +122,7 @@ class PresaleService {
   }
 
   isConfigured() {
-    return Boolean(this.config.treasury && this.config.quoteSecret.length >= 32);
+    return Boolean(this.config.hasProductionRpc && this.config.treasury && this.config.quoteSecret.length >= 32);
   }
 
   async getSolUsdPrice() {
@@ -171,10 +171,10 @@ class PresaleService {
     let chainStatus = this.isConfigured() ? 'live' : 'unconfigured';
     if (reconcile && this.isConfigured()) {
       try {
-        await withTimeout(this.reconcileRecent(), 6000, 'Solana testnet RPC timed out.');
+        await withTimeout(this.reconcileRecent(), 6000, 'Solana RPC timed out.');
       } catch (error) {
         chainStatus = 'degraded';
-        console.warn('Testnet reconciliation is temporarily unavailable.', error.message);
+        console.warn('Mainnet reconciliation is temporarily unavailable.', error.message);
       }
     }
     const { records, totals } = this.aggregate();
@@ -231,9 +231,9 @@ class PresaleService {
     const buyer = new PublicKey(wallet);
     const normalizedMethod = String(method || '').toUpperCase();
     if (!['SOL', 'USDC'].includes(normalizedMethod)) throw new Error('Unsupported payment method.');
-    if (normalizedMethod === 'USDC' && !this.config.usdcMint) throw new Error('Test USDC payments are not configured yet.');
+    if (normalizedMethod === 'USDC' && !this.config.usdcMint) throw new Error('USDC payments are not configured yet.');
 
-    await withTimeout(this.reconcileRecent(), 6000, 'Solana testnet RPC timed out.');
+    await withTimeout(this.reconcileRecent(), 6000, 'Solana RPC timed out.');
     const { totals } = this.aggregate();
     const stage = this.currentStage(totals);
     if (!stage) throw new Error('All presale stages are sold out.');
@@ -386,7 +386,7 @@ class PresaleService {
       commitment: 'confirmed',
       maxSupportedTransactionVersion: 0,
     });
-    if (!transaction) throw new Error('Transaction is not confirmed on Solana testnet yet.');
+    if (!transaction) throw new Error('Transaction is not confirmed on Solana Mainnet yet.');
     const record = this.store.add(this.recordFromTransaction(signature, transaction, payload));
     return { purchase: record, state: await this.state({ reconcile: false }) };
   }

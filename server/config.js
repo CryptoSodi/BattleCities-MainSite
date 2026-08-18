@@ -16,8 +16,9 @@ function optionalPublicKey(value, name) {
 }
 
 function loadConfig(env = process.env) {
-  const network = env.PRESALE_NETWORK || 'testnet';
-  if (network !== 'testnet') throw new Error('PRESALE_NETWORK must remain testnet until production review.');
+  const network = env.PRESALE_NETWORK || 'mainnet-beta';
+  if (network !== 'mainnet-beta') throw new Error('PRESALE_NETWORK must be mainnet-beta.');
+  const rpcUrl = env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
 
   const endAt = new Date(env.PRESALE_END_AT || '2026-09-13T00:00:00.000Z');
   if (Number.isNaN(endAt.getTime())) throw new Error('PRESALE_END_AT must be an ISO timestamp.');
@@ -27,7 +28,8 @@ function loadConfig(env = process.env) {
 
   return {
     network,
-    rpcUrl: env.SOLANA_RPC_URL || 'https://api.testnet.solana.com',
+    rpcUrl,
+    hasProductionRpc: Boolean(env.SOLANA_RPC_URL),
     treasury: optionalPublicKey(env.PRESALE_TREASURY_ADDRESS, 'PRESALE_TREASURY_ADDRESS'),
     usdcMint: optionalPublicKey(env.PRESALE_USDC_MINT, 'PRESALE_USDC_MINT'),
     quoteSecret: env.PRESALE_QUOTE_SECRET || '',

@@ -22,7 +22,7 @@ test('API serves live state while protected files remain unreachable', async () 
     const stateResponse = await fetch(`http://127.0.0.1:${port}/api/presale/state`);
     const state = await stateResponse.json();
     assert.equal(stateResponse.status, 200);
-    assert.equal(state.network, 'testnet');
+    assert.equal(state.network, 'mainnet-beta');
     assert.equal(state.targetUsd, '3025');
 
     const secretResponse = await fetch(`http://127.0.0.1:${port}/.env`);
