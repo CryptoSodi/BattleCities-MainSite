@@ -27,6 +27,23 @@ test('the final presale stage displays as 0.00009 SOL at the configured referenc
   assert.equal(Number(finalStage.priceMicros) / 1_000_000 / 150, 0.00009);
 });
 
+test('the completed presale keeps the fixed final price visible', async () => {
+  const config = loadConfig({ SOL_USD_PRICE: '200' });
+  const store = {
+    list: () => config.stages.map(stage => ({
+      stageId: stage.id,
+      tokenMicros: stage.allocationMicros.toString(),
+      usdMicros: '0',
+      wallet: `buyer-${stage.id}`,
+    })),
+  };
+  const service = new PresaleService(config, store);
+  const state = await service.state({ reconcile: false });
+
+  assert.equal(state.currentStageId, null);
+  assert.equal(state.currentPriceSol, '0.00009');
+});
+
 test('quote tokens detect tampering', () => {
   const secret = 'test-secret-that-is-at-least-32-characters';
   const payload = { id: 'quote-1', wallet: 'wallet', paymentAtomic: '1000' };

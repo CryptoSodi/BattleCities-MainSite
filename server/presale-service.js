@@ -204,7 +204,11 @@ class PresaleService {
       participants: new Set(records.map(record => record.wallet)).size,
       currentStageId: current?.id || null,
       currentPriceUsd: displayedPriceStage ? decimalString(displayedPriceStage.priceMicros, 6) : null,
-      currentPriceSol: displayedPriceStage ? priceSol(displayedPriceStage) : null,
+      currentPriceSol: current
+        ? priceSol(current)
+        : displayedPriceStage
+          ? '0.00009'
+          : null,
       solUsdPrice: String(solPrice.value),
       priceSource: solPrice.source,
       paymentMethods: { SOL: true, USDC: Boolean(this.config.usdcMint) },
