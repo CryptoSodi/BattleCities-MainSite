@@ -23,7 +23,8 @@
 .wp-section p{font-size:17px;line-height:1.72;color:var(--gray);}
 .wp-section p+p{margin-top:18px;}
 .wp-two-col,.wp-disclosure-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);gap:60px;align-items:start;}
-.wp-equation{font-family:'Share Tech Mono',monospace;color:var(--white)!important;font-size:21px!important;line-height:1.45!important;margin:20px 0!important;}
+.wp-two-col .wp-formula{grid-column:1 / -1;}
+.wp-equation{font-family:'Share Tech Mono',monospace;color:var(--white)!important;font-size:clamp(16px,1.65vw,21px)!important;line-height:1.45!important;margin:20px 0!important;white-space:nowrap;overflow-x:auto;}
 .wp-formula p:last-child{font-size:14px;}
 .wp-toc{padding-block:46px;}
 .wp-toc h2{font-size:23px;margin-bottom:27px;}
