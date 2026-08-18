@@ -9,14 +9,14 @@
  * ───────────────────────────────────────────────────────── */
 
 const TIMING = {
-  revealDuration: 600,
+  revealDuration: 350,
 };
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 document.documentElement.style.setProperty('--wp-reveal-duration', `${TIMING.revealDuration}ms`);
 
 const revealTargets = document.querySelectorAll(
-  '.wp-brief, .wp-formula, .wp-feature-grid article, .wp-reward-card, .wp-powerup-grid article, .tokenomics .pixel-frame, .tokenomics .alloc-list, .whitepaper-roadmap .timeline-list',
+  '.wp-hero-brand, .wp-kicker, .wp-hero h1, .wp-lede, .wp-actions, .wp-brief, .wp-section .sec-tag, .wp-section h2, .wp-section-intro, .wp-toc-grid, .wp-formula, .wp-feature-grid article, .wp-table-wrap, .wp-note, .wp-powerups-head, .wp-powerup-grid article, .wp-economy-flow, .wp-reward-card, .wp-disclaimer, .tokenomics .pixel-frame, .tokenomics .alloc-list, .whitepaper-roadmap .timeline-list, .wp-disclosure-grid',
 );
 
 revealTargets.forEach(target => target.classList.add('reveal'));
