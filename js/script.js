@@ -341,15 +341,19 @@ function renderPresaleState(state){
     : 'All presale stages are sold out';
   document.getElementById('participant-count').textContent = formatTokenAmount(state.participants, true);
   document.getElementById('total-sold').textContent = `${formatTokenAmount(state.soldBatc, true)} BATC`;
-  const totalAvailable = state.stages.reduce((sum, stage) => {
+  const { totalAllocation, totalSold } = state.stages.reduce((totals, stage) => {
     const stageAllocation = safeNumber(stage.allocationBatc) || 0;
     const stageSold = safeNumber(stage.soldBatc) || 0;
-    return sum + Math.max(0, stageAllocation - stageSold);
-  }, 0);
+    totals.totalAllocation += stageAllocation;
+    totals.totalSold += Math.min(stageAllocation, stageSold);
+    return totals;
+  }, { totalAllocation: 0, totalSold: 0 });
+  const totalAvailable = Math.max(0, totalAllocation - totalSold);
   document.getElementById('total-available').textContent = `${formatTokenAmount(totalAvailable, true)} BATC`;
-  const progress = allocation > 0 ? soldInStage / allocation * 100 : 0;
-  renderProgress(progress);
-  document.getElementById('hero-presale-sold').textContent = `${Math.round(progress)}%`;
+  const stageProgress = allocation > 0 ? soldInStage / allocation * 100 : 0;
+  const combinedProgress = totalAllocation > 0 ? totalSold / totalAllocation * 100 : 0;
+  renderProgress(stageProgress);
+  document.getElementById('hero-presale-sold').textContent = `${Math.round(combinedProgress)}%`;
   state.stages.forEach(renderStage);
 
   const currentPrice = `${formatSol(state.currentPriceSol)} SOL`;
