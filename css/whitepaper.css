@@ -74,6 +74,9 @@
 .wp-token-profile div:nth-last-child(-n+2){border-bottom:0;}
 .wp-token-profile dt{font-family:'Share Tech Mono',monospace;color:var(--gray);font-size:14px;}
 .wp-token-profile dd{font-family:'Share Tech Mono',monospace;color:var(--neon);font-size:14px;text-align:right;}
+.wp-tokenomics-grid{width:min(1120px,90%);max-width:none;}
+.tokenomics .sec-head h2{font-size:clamp(22px,3.2vw,34px);line-height:1.5;max-width:640px;}
+.tokenomics .sec-head p{font-size:15px;line-height:1.7;max-width:640px;}
 .whitepaper-roadmap{padding-bottom:42px;}
 .whitepaper-roadmap .sec-head{margin-bottom:56px;}
 .whitepaper-roadmap .sec-head h2{max-width:none;}
