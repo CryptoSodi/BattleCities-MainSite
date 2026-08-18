@@ -23,7 +23,7 @@ test('API serves live state while protected files remain unreachable', async () 
     const state = await stateResponse.json();
     assert.equal(stateResponse.status, 200);
     assert.equal(state.network, 'mainnet-beta');
-    assert.equal(state.targetUsd, '3025');
+    assert.equal(state.targetUsd, '3925');
 
     const secretResponse = await fetch(`http://127.0.0.1:${port}/.env`);
     assert.notEqual(secretResponse.status, 200);

@@ -179,6 +179,8 @@ class PresaleService {
     }
     const { records, totals } = this.aggregate();
     const current = this.currentStage(totals);
+    const finalStage = this.config.stages.at(-1);
+    const displayedPriceStage = current || finalStage;
     const solPrice = await this.getSolUsdPrice();
     const totalRaisedMicros = [...totals.values()].reduce((sum, value) => sum + value.raisedMicros, 0n);
     const totalSoldMicros = [...totals.values()].reduce((sum, value) => sum + value.soldMicros, 0n);
@@ -201,8 +203,8 @@ class PresaleService {
       soldBatc: decimalString(totalSoldMicros, 6),
       participants: new Set(records.map(record => record.wallet)).size,
       currentStageId: current?.id || null,
-      currentPriceUsd: current ? decimalString(current.priceMicros, 6) : null,
-      currentPriceSol: current ? priceSol(current) : null,
+      currentPriceUsd: displayedPriceStage ? decimalString(displayedPriceStage.priceMicros, 6) : null,
+      currentPriceSol: displayedPriceStage ? priceSol(displayedPriceStage) : null,
       solUsdPrice: String(solPrice.value),
       priceSource: solPrice.source,
       paymentMethods: { SOL: true, USDC: Boolean(this.config.usdcMint) },

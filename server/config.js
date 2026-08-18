@@ -3,7 +3,7 @@ const { PublicKey } = require('@solana/web3.js');
 const STAGES = Object.freeze([
   { id: 1, label: 'Stage 1', priceMicros: 5_000n, allocationMicros: 200_000_000_000n },
   { id: 2, label: 'Stage 2', priceMicros: 6_000n, allocationMicros: 150_000_000_000n },
-  { id: 3, label: 'Stage 3', priceMicros: 7_500n, allocationMicros: 150_000_000_000n },
+  { id: 3, label: 'Stage 3', priceMicros: 13_500n, allocationMicros: 150_000_000_000n },
 ]);
 
 function optionalPublicKey(value, name) {

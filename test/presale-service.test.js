@@ -7,7 +7,7 @@ const {
   signPayload,
   verifyToken,
 } = require('../server/presale-service');
-const { loadConfig } = require('../server/config');
+const { loadConfig, STAGES } = require('../server/config');
 
 test('decimal payment amounts convert to exact atomic units', () => {
   assert.equal(parseDecimalToAtomic('0.005', 9), 5_000_000n);
@@ -20,6 +20,11 @@ test('atomic values render without scientific notation', () => {
   assert.equal(decimalString(5_000n, 6), '0.005');
   assert.equal(decimalString(200_000_000_000n, 6), '200000');
   assert.equal(decimalString(0n, 6), '0');
+});
+
+test('the final presale stage displays as 0.00009 SOL at the configured reference rate', () => {
+  const finalStage = STAGES.at(-1);
+  assert.equal(Number(finalStage.priceMicros) / 1_000_000 / 150, 0.00009);
 });
 
 test('quote tokens detect tampering', () => {
