@@ -74,16 +74,14 @@
 .wp-token-profile div:nth-last-child(-n+2){border-bottom:0;}
 .wp-token-profile dt{font-family:'Share Tech Mono',monospace;color:var(--gray);font-size:14px;}
 .wp-token-profile dd{font-family:'Share Tech Mono',monospace;color:var(--neon);font-size:14px;text-align:right;}
-.wp-roadmap{list-style:none;margin:32px 0 0;border-left:1px solid var(--line);}
-.wp-roadmap li{display:grid;grid-template-columns:160px 1fr;gap:28px;padding:17px 24px;position:relative;border-bottom:1px solid var(--line);font-size:17px;line-height:1.5;}
-.wp-roadmap li::before{content:"";position:absolute;width:9px;height:9px;background:var(--neon);left:-5px;top:25px;box-shadow:0 0 12px var(--neon-glow);}
-.wp-roadmap time{font-family:'Share Tech Mono',monospace;color:var(--neon);font-size:15px;}
-.wp-roadmap span{display:flex;flex-direction:column;gap:4px;}
-.wp-roadmap strong{font-size:17px;color:var(--white);}
-.wp-roadmap small{font-size:14px;color:var(--gray);line-height:1.5;}
+.whitepaper-roadmap{padding-bottom:42px;}
+.whitepaper-roadmap .sec-head{margin-bottom:56px;}
+.whitepaper-roadmap .sec-head h2{max-width:none;}
+.wp-timeline-list{width:min(1360px,90%);max-width:none;}
+.whitepaper-roadmap .wp-disclaimer{margin-top:42px!important;}
 .wp-disclosure-section{background:linear-gradient(120deg,rgba(255,179,15,.09),rgba(13,18,22,.4) 45%,rgba(13,18,22,.7));}
 .wp-disclosure-grid p{font-size:16px;}
 .wp-disclosure-grid .btn{margin-top:28px;}
 .whitepaper-page footer{margin-top:0;}
 @media(max-width:850px){.wp-hero-grid,.wp-two-col,.wp-disclosure-grid{grid-template-columns:1fr;gap:34px;}.wp-feature-grid,.wp-reward-grid{grid-template-columns:1fr;}.wp-powerup-grid{grid-template-columns:repeat(2,1fr);}.wp-token-grid{grid-template-columns:repeat(2,1fr);}.wp-toc-grid{grid-template-columns:repeat(2,1fr);}.wp-hero{padding-top:78px;}.wp-hero::after{opacity:.15;}}
-@media(max-width:640px){.whitepaper-page{padding-bottom:0;}.wp-shell{width:min(100% - 32px,1120px);}.wp-section{padding:58px 0;}.wp-hero{padding:58px 0 62px;}.wp-hero h1{font-size:25px;}.wp-game-logo{margin-left:-10px;}.wp-lede{font-size:16px;}.wp-toc-grid{grid-template-columns:1fr;}.wp-toc-grid a{min-height:54px;}.wp-powerups-head{display:block;margin-top:44px;}.wp-powerups-head>p{margin-top:18px;}.wp-powerup-grid{grid-template-columns:1fr;}.wp-powerup-grid article{min-height:0;flex-direction:row;align-items:center;}.wp-powerup-grid img{flex:none;}.wp-economy-flow li{width:100%;}.wp-economy-flow li::after{float:right;margin-left:0!important;}.wp-economy-flow li:last-child::after{display:none;}.wp-token-grid,.wp-token-profile{grid-template-columns:1fr 1fr;}.wp-token-grid div{min-height:122px;padding:17px;}.wp-token-profile div{border-right:0;}.wp-token-profile div:nth-last-child(-n+2){border-bottom:1px solid var(--line);}.wp-token-profile div:last-child{border-bottom:0;}.wp-token-heading{align-items:flex-start;}.wp-token-heading img{width:52px;height:52px;}.wp-roadmap li{grid-template-columns:1fr;gap:7px;padding:17px 18px 17px 24px;}.wp-section p{font-size:16px;}.wp-actions .btn{width:100%;justify-content:center;}}
+@media(max-width:640px){.whitepaper-page{padding-bottom:0;}.wp-shell{width:min(100% - 32px,1120px);}.wp-section{padding:58px 0;}.wp-hero{padding:58px 0 62px;}.wp-hero h1{font-size:25px;}.wp-game-logo{margin-left:-10px;}.wp-lede{font-size:16px;}.wp-toc-grid{grid-template-columns:1fr;}.wp-toc-grid a{min-height:54px;}.wp-powerups-head{display:block;margin-top:44px;}.wp-powerups-head>p{margin-top:18px;}.wp-powerup-grid{grid-template-columns:1fr;}.wp-powerup-grid article{min-height:0;flex-direction:row;align-items:center;}.wp-powerup-grid img{flex:none;}.wp-economy-flow li{width:100%;}.wp-economy-flow li::after{float:right;margin-left:0!important;}.wp-economy-flow li:last-child::after{display:none;}.wp-token-grid,.wp-token-profile{grid-template-columns:1fr 1fr;}.wp-token-grid div{min-height:122px;padding:17px;}.wp-token-profile div{border-right:0;}.wp-token-profile div:nth-last-child(-n+2){border-bottom:1px solid var(--line);}.wp-token-profile div:last-child{border-bottom:0;}.wp-token-heading{align-items:flex-start;}.wp-token-heading img{width:52px;height:52px;}.wp-section p{font-size:16px;}.wp-actions .btn{width:100%;justify-content:center;}}
