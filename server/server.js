@@ -14,6 +14,7 @@ const contentTypes = {
   '.html': 'text/html; charset=utf-8',
   '.ico': 'image/x-icon',
   '.js': 'text/javascript; charset=utf-8',
+  '.pdf': 'application/pdf',
   '.png': 'image/png',
   '.svg': 'image/svg+xml',
   '.webp': 'image/webp',
@@ -89,6 +90,8 @@ function resolveStaticPath(pathname) {
     return null;
   }
   const publicPath = requested === '/index.html'
+    || requested === '/whitepaper.html'
+    || requested === '/output/pdf/battle-cities-whitepaper-v0.4.pdf'
     || requested === '/test.html'
     || ['/css/', '/js/', '/images/'].some(prefix => requested.startsWith(prefix));
   if (!publicPath || requested.split('/').some(segment => segment.startsWith('.'))) {
