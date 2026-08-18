@@ -328,7 +328,13 @@ function renderStage(stage){
 }
 
 function renderPresaleState(state){
-  presaleState = state;
+  const suppliedPrice = safeNumber(state.currentPriceSol);
+  const finalPrice = suppliedPrice !== null && suppliedPrice > 0
+    ? state.currentPriceSol
+    : state.ended
+      ? '0.00009'
+      : state.currentPriceSol;
+  presaleState = { ...state, currentPriceSol: finalPrice };
   endDate = new Date(state.endAt);
   updateCountdown();
   const activeStage = state.stages.find(stage => stage.id === state.currentStageId) || null;
@@ -356,7 +362,7 @@ function renderPresaleState(state){
   document.getElementById('hero-presale-sold').textContent = `${Math.round(combinedProgress)}%`;
   state.stages.forEach(renderStage);
 
-  const currentPrice = `${formatSol(state.currentPriceSol)} SOL`;
+  const currentPrice = `${formatSol(presaleState.currentPriceSol)} SOL`;
   document.getElementById('token-price').textContent = currentPrice;
   document.getElementById('hero-current-price').textContent = currentPrice;
   updateRateText();
