@@ -77,7 +77,9 @@
 .whitepaper-roadmap{padding-bottom:42px;}
 .whitepaper-roadmap .sec-head{margin-bottom:56px;}
 .whitepaper-roadmap .sec-head h2{max-width:none;}
+.whitepaper-roadmap .sec-head p{font-size:15px;line-height:1.7;max-width:640px;}
 .wp-timeline-list{width:min(1360px,90%);max-width:none;}
+.whitepaper-roadmap .tl-body p{margin-top:8px;font-size:13px;line-height:1.6;}
 .whitepaper-roadmap .wp-disclaimer{margin-top:42px!important;}
 .wp-disclosure-section{background:linear-gradient(120deg,rgba(255,179,15,.09),rgba(13,18,22,.4) 45%,rgba(13,18,22,.7));}
 .wp-disclosure-grid p{font-size:16px;}
