@@ -54,6 +54,9 @@
 .wp-roadmap li{display:grid;grid-template-columns:160px 1fr;gap:28px;padding:17px 24px;position:relative;border-bottom:1px solid var(--line);font-size:17px;line-height:1.5;}
 .wp-roadmap li::before{content:"";position:absolute;width:9px;height:9px;background:var(--neon);left:-5px;top:25px;box-shadow:0 0 12px var(--neon-glow);}
 .wp-roadmap time{font-family:'Share Tech Mono',monospace;color:var(--neon);font-size:15px;}
+.wp-roadmap span{display:flex;flex-direction:column;gap:4px;}
+.wp-roadmap strong{font-size:17px;color:var(--white);}
+.wp-roadmap small{font-size:14px;color:var(--gray);line-height:1.5;}
 .wp-disclosure-section{background:linear-gradient(120deg,rgba(255,179,15,.09),rgba(13,18,22,.4) 45%,rgba(13,18,22,.7));}
 .wp-disclosure-grid p{font-size:16px;}
 .wp-disclosure-grid .btn{margin-top:28px;}
