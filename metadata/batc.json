@@ -4,6 +4,15 @@
   "description": "BATC is the utility token powering the Battle Cities ecosystem.",
   "image": "https://battlecities.com/images/coin%20logo.png",
   "external_url": "https://battlecities.com/",
+  "properties": {
+    "files": [
+      {
+        "uri": "https://battlecities.com/images/coin%20logo.png",
+        "type": "image/png"
+      }
+    ],
+    "category": "image"
+  },
   "attributes": [
     {
       "trait_type": "Network",
