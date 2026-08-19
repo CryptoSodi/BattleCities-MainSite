@@ -76,6 +76,22 @@ document.querySelectorAll('[data-deployment-url]').forEach(link => {
   link.addEventListener('click', beginPageDeployment);
 });
 
+const scrollTopButton = document.getElementById('wpScrollTop');
+if (scrollTopButton) {
+  const updateScrollTopButton = () => {
+    const isVisible = window.scrollY > 520;
+    scrollTopButton.classList.toggle('is-visible', isVisible);
+    scrollTopButton.setAttribute('aria-hidden', String(!isVisible));
+    scrollTopButton.tabIndex = isVisible ? 0 : -1;
+  };
+
+  scrollTopButton.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+  });
+  window.addEventListener('scroll', updateScrollTopButton, { passive: true });
+  updateScrollTopButton();
+}
+
 window.addEventListener('pageshow', () => {
   if (document.documentElement.classList.contains('deployment-arrival')) return;
   if (pageDeploymentTimer) window.clearTimeout(pageDeploymentTimer);
