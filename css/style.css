@@ -140,6 +140,7 @@ nav{
   color:var(--supply);font-family:'Share Tech Mono',monospace;font-size:11px;
   font-weight:700;letter-spacing:.65px;white-space:nowrap;
 }
+.presence-hud[hidden]{display:none!important;}
 .presence-led{width:8px;height:8px;background:var(--supply);box-shadow:0 0 7px rgba(71,222,23,.7);}
 .presence-round{color:var(--neon);}
 .presence-divider{color:var(--shop-button-edge);}
