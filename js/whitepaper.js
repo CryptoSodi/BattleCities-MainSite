@@ -92,6 +92,18 @@ if (scrollTopButton) {
   updateScrollTopButton();
 }
 
+const mobileNavItems = document.querySelectorAll('.whitepaper-page .bottom-nav [data-section]');
+if (mobileNavItems.length && 'IntersectionObserver' in window) {
+  const mobileSections = document.querySelectorAll('#tokenomics, #roadmap');
+  const mobileNavObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      mobileNavItems.forEach(item => item.classList.toggle('active', item.dataset.section === entry.target.id));
+    });
+  }, { threshold: 0.3 });
+  mobileSections.forEach(section => mobileNavObserver.observe(section));
+}
+
 window.addEventListener('pageshow', () => {
   if (document.documentElement.classList.contains('deployment-arrival')) return;
   if (pageDeploymentTimer) window.clearTimeout(pageDeploymentTimer);
