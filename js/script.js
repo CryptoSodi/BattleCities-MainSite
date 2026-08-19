@@ -468,8 +468,9 @@ function renderQuickAmounts(){
         let value = preset.value;
         if (value === 'max') {
           if (!connectedWallet) throw new Error('Connect Phantom to load your SOL balance.');
-          const connection = new solanaWeb3.Connection(presaleState.rpcUrl, 'confirmed');
-          const lamports = await connection.getBalance(new solanaWeb3.PublicKey(connectedWallet), 'confirmed');
+          const balance = await apiRequest(`/api/presale/balance?wallet=${encodeURIComponent(connectedWallet)}`);
+          const lamports = safeNumber(balance.lamports);
+          if (lamports === null) throw new Error('Could not load your SOL balance. Try again in a moment.');
           const walletMax = Math.max(0, (lamports - 10000000) / solanaWeb3.LAMPORTS_PER_SOL);
           const saleMax = safeNumber(presaleState?.maxPaySol) || 0;
           value = Math.min(walletMax, saleMax).toFixed(9).replace(/\.?(0+)$/, '');
