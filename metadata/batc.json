@@ -1,0 +1,13 @@
+{
+  "name": "Battle Cities",
+  "symbol": "BATC",
+  "description": "BATC is the utility token powering the Battle Cities ecosystem.",
+  "image": "https://battlecities.com/images/coin%20logo.png",
+  "external_url": "https://battlecities.com/",
+  "attributes": [
+    {
+      "trait_type": "Network",
+      "value": "Solana"
+    }
+  ]
+}
