@@ -15,10 +15,27 @@ function optionalPublicKey(value, name) {
   }
 }
 
+function normalizeRpcUrl(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return 'https://api.mainnet-beta.solana.com';
+
+  const withProtocol = /^[a-z][a-z\d+.-]*:\/\//i.test(raw) ? raw : `https://${raw}`;
+  let endpoint;
+  try {
+    endpoint = new URL(withProtocol);
+  } catch {
+    throw new Error('SOLANA_RPC_URL must be a valid http: or https: URL.');
+  }
+  if (!['http:', 'https:'].includes(endpoint.protocol)) {
+    throw new Error('SOLANA_RPC_URL must start with http: or https:.');
+  }
+  return endpoint.toString();
+}
+
 function loadConfig(env = process.env) {
   const network = env.PRESALE_NETWORK || 'mainnet-beta';
   if (network !== 'mainnet-beta') throw new Error('PRESALE_NETWORK must be mainnet-beta.');
-  const rpcUrl = env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
+  const rpcUrl = normalizeRpcUrl(env.SOLANA_RPC_URL);
 
   const endAt = new Date(env.PRESALE_END_AT || '2026-09-13T00:00:00.000Z');
   if (Number.isNaN(endAt.getTime())) throw new Error('PRESALE_END_AT must be an ISO timestamp.');
@@ -29,7 +46,7 @@ function loadConfig(env = process.env) {
   return {
     network,
     rpcUrl,
-    hasProductionRpc: Boolean(env.SOLANA_RPC_URL),
+    hasProductionRpc: Boolean(String(env.SOLANA_RPC_URL || '').trim()),
     treasury: optionalPublicKey(env.PRESALE_TREASURY_ADDRESS, 'PRESALE_TREASURY_ADDRESS'),
     usdcMint: optionalPublicKey(env.PRESALE_USDC_MINT, 'PRESALE_USDC_MINT'),
     quoteSecret: env.PRESALE_QUOTE_SECRET || '',
@@ -48,4 +65,4 @@ function loadConfig(env = process.env) {
   };
 }
 
-module.exports = { STAGES, loadConfig };
+module.exports = { STAGES, loadConfig, normalizeRpcUrl };

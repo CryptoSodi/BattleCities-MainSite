@@ -16,6 +16,18 @@ test('decimal payment amounts convert to exact atomic units', () => {
   assert.throws(() => parseDecimalToAtomic('-1', 9), /valid positive/);
 });
 
+test('host-only Solana RPC values are normalized to HTTPS endpoints', () => {
+  const config = loadConfig({ SOLANA_RPC_URL: 'mainnet.rpc-provider.example/v1/key' });
+  assert.equal(config.rpcUrl, 'https://mainnet.rpc-provider.example/v1/key');
+});
+
+test('Solana RPC values reject unsupported endpoint protocols', () => {
+  assert.throws(
+    () => loadConfig({ SOLANA_RPC_URL: 'ws://mainnet.rpc-provider.example' }),
+    /SOLANA_RPC_URL must start with http: or https:/,
+  );
+});
+
 test('atomic values render without scientific notation', () => {
   assert.equal(decimalString(5_000n, 6), '0.005');
   assert.equal(decimalString(200_000_000_000n, 6), '200000');
