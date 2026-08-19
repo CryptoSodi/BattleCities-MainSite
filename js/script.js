@@ -831,7 +831,6 @@ const observer = new IntersectionObserver((entries) => {
     if (entry.isIntersecting) {
       const id = entry.target.id;
       bnItems.forEach(item => {
-        if (item.classList.contains('bn-cta')) return;
         item.classList.toggle('active', item.dataset.section === id);
       });
     }

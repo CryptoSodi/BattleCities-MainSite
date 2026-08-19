@@ -666,24 +666,10 @@ footer .logo-text{font-size:12px;}
   .bn-item.active{color:var(--neon);}
   .bn-item.active svg{filter:drop-shadow(0 0 6px var(--neon-glow));transform:translateY(-1px);}
 
-  /* Buy CTA: always-on neon glow + reuses the shared .glitch effect so it
-     visually matches the hero title's "tap me" energy on the tab bar. */
-  .bn-item.bn-cta{color:var(--neon);position:relative;animation:bnCtaPulse 2.2s ease-in-out infinite;}
-  .bn-item.bn-cta svg{filter:drop-shadow(0 0 5px var(--neon-glow));}
-  .bn-item.bn-cta::before{
-    content:"";position:absolute;top:-2px;left:14%;right:14%;height:2px;background:var(--neon);
-    box-shadow:0 0 8px var(--neon-glow);opacity:0;transition:.2s;
-  }
-  .bn-item.bn-cta.active::before{opacity:1;}
-  .bn-item.bn-cta .glitch{font-size:9.5px;}
 }
 @media(prefers-reduced-motion: reduce){
   .deployment-overlay,.deployment-door,.deployment-readout,.deployment-readout>i em{animation:none !important;}
   .deployment-arrival .deployment-overlay{visibility:hidden;}
-}
-@keyframes bnCtaPulse{
-  0%,100%{ text-shadow:0 0 4px var(--neon-glow); }
-  50%{ text-shadow:0 0 10px var(--neon-glow), 0 0 18px rgba(255,179,15,.4); }
 }
 
 /* Cherry chat launcher. The embedded panel derives its palette from the same
