@@ -349,11 +349,19 @@ function renderAllocationResult(){
 async function verifyAllocation(signature, quoteToken){
   updateProgressRow('payment', 'confirmed', 'SOL payment confirmed');
   updateProgressRow('allocation', 'pending', 'Recording your BATC allocation');
-  const response = await apiRequest('/api/presale/verify', {
-    method: 'POST',
-    body: JSON.stringify({ signature, quoteToken }),
-  });
-  return { recorded: renderAllocationResult(), response };
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    try {
+      const response = await apiRequest('/api/presale/verify', {
+        method: 'POST',
+        body: JSON.stringify({ signature, quoteToken }),
+      });
+      return { recorded: renderAllocationResult(), response };
+    } catch (error) {
+      if (!/not confirmed on Solana/i.test(error.message || '') || attempt === 4) throw error;
+      await new Promise(resolve => setTimeout(resolve, 1200));
+    }
+  }
+  throw new Error('Payment confirmation is still pending.');
 }
 
 async function apiRequest(path, options = {}){
@@ -669,11 +677,6 @@ async function reviewPurchase(){
     character => character.charCodeAt(0),
   );
   pendingQuote.preparedTransaction = solanaWeb3.Transaction.from(transactionBytes);
-  const connection = new solanaWeb3.Connection(presaleState.rpcUrl, 'confirmed');
-  const simulation = await connection.simulateTransaction(pendingQuote.preparedTransaction);
-  if (simulation.value.err) {
-    throw new Error('The transaction did not pass simulation. Check your balance and request a new quote.');
-  }
   document.getElementById('confirm-pay').textContent = `${pendingQuote.payAmount} ${pendingQuote.method}`;
   document.getElementById('confirm-receive').textContent = `${formatTokenAmount(pendingQuote.batcAmount, true)} BATC`;
   document.getElementById('confirm-price').textContent = formatQuoteTokenPrice(pendingQuote);
@@ -696,7 +699,6 @@ async function submitPurchase(){
   try {
     const transaction = quote.preparedTransaction;
     if (!transaction) throw new Error('This quote is not ready. Close the dialog and request it again.');
-    const connection = new solanaWeb3.Connection(presaleState.rpcUrl, 'confirmed');
     setPurchaseDialogError();
     const { signature } = await phantomProvider.signAndSendTransaction(transaction);
     paymentSignature = signature;
@@ -705,11 +707,6 @@ async function submitPurchase(){
     const explorer = mainnetExplorer(signature);
     showPurchaseProgress(signature);
     setPurchaseStatus('SOL payment submitted. Waiting for confirmation…', 'info', explorer, 'Payment transaction ↗');
-    await connection.confirmTransaction({
-      signature,
-      blockhash: quote.blockhash,
-      lastValidBlockHeight: quote.lastValidBlockHeight,
-    }, 'confirmed');
     pendingAllocationRetry = { signature, quoteToken: quote.quoteToken };
     const allocation = await verifyAllocation(signature, quote.quoteToken);
     document.getElementById('payAmount').value = '';
