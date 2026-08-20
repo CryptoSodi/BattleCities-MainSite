@@ -124,13 +124,16 @@ window.addEventListener('pageshow', () => {
 // Public game presence: authenticated players send heartbeats in the game;
 // this website only reads the aggregate count and never sends credentials.
 async function updatePresence(){
+  const presenceHud = document.querySelector('.presence-hud');
   const onlineCount = document.getElementById('online-count');
   const inGameCount = document.getElementById('in-game-count');
-  if (!onlineCount || !inGameCount) return;
+  if (!presenceHud || !onlineCount || !inGameCount) return;
   try {
     const response = await fetch('https://api.battlecities.com/api/presence', { cache: 'no-store' });
     if (!response.ok) throw new Error(`Presence request failed: ${response.status}`);
     const presence = await response.json();
+    presenceHud.hidden = presence.liveUsersEnabled !== true;
+    if (presence.liveUsersEnabled !== true) return;
     onlineCount.textContent = Number.isFinite(presence.online) ? presence.online : '--';
     inGameCount.textContent = Number.isFinite(presence.inGame) ? presence.inGame : '--';
   } catch (error) {
