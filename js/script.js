@@ -375,6 +375,45 @@ async function apiRequest(path, options = {}){
   return body;
 }
 
+// X account connection is handled by the API so its OAuth credentials never
+// reach the browser. The status endpoint re-checks the current follow state.
+const xConnectButton = document.getElementById('x-connect-button');
+
+function setXConnectLabel(label){
+  const icon = xConnectButton?.querySelector('svg');
+  if (!xConnectButton || !icon) return;
+  xConnectButton.replaceChildren(icon, document.createTextNode(label));
+}
+
+async function refreshXConnection(){
+  if (!xConnectButton) return;
+  const params = new URLSearchParams(window.location.search);
+  const xConnectionResult = params.get('xConnected') ? 'connected' : params.get('xError');
+  if (xConnectionResult) {
+    params.delete('xConnected');
+    params.delete('xError');
+    const search = params.toString();
+    window.history.replaceState({}, '', `${window.location.pathname}${search ? `?${search}` : ''}${window.location.hash}`);
+  }
+  try {
+    const response = await fetch(`${PRESALE_API_BASE}/api/integrations/x/status`, {
+      credentials: 'include',
+      cache: 'no-store',
+    });
+    const status = await response.json().catch(() => ({}));
+    if (!response.ok || !status.connected) return;
+    xConnectButton.href = 'https://x.com/BattleCitiesHQ';
+    xConnectButton.target = '_blank';
+    xConnectButton.rel = 'noopener noreferrer';
+    setXConnectLabel(status.follows ? 'X Connected · Following' : 'X Connected · Follow @BattleCitiesHQ');
+  } catch (error) {
+    console.warn('Unable to check X connection.', error);
+  }
+  if (xConnectionResult === 'error') setXConnectLabel('X Connect Failed · Retry');
+}
+
+refreshXConnection();
+
 function renderStage(stage){
   const row = document.querySelector(`[data-stage-id="${stage.id}"]`);
   if (!row) return;
