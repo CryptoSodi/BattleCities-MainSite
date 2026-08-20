@@ -418,10 +418,13 @@ async function refreshXConnection(){
     ? 'connected'
     : params.get('xFollowVerified')
       ? 'follow-verified'
+      : params.get('xRepostClaimed')
+        ? 'repost-claimed'
       : params.get('xError');
   if (xConnectionResult) {
     params.delete('xConnected');
     params.delete('xFollowVerified');
+    params.delete('xRepostClaimed');
     params.delete('xError');
     const search = params.toString();
     window.history.replaceState({}, '', `${window.location.pathname}${search ? `?${search}` : ''}${window.location.hash}`);
@@ -439,7 +442,11 @@ async function refreshXConnection(){
     xConnectButton.href = 'https://x.com/BattleCitiesHQ';
     xConnectButton.target = '_blank';
     xConnectButton.rel = 'noopener noreferrer';
-    if (status.follows) {
+    if (status.follows && status.repostTask) {
+      setXButtonAction('repost');
+      xConnectButton.href = status.repostTask.postUrl;
+      setXConnectLabel(`REPOST · +${status.repostTask.rewardFuel} FUEL`);
+    } else if (status.follows) {
       setXFollowRefreshReady(false);
       setXButtonAction('following');
       setXConnectLabel('X Connected · Following');
@@ -463,6 +470,11 @@ if (xConnectButton) {
     if (xConnectButton.dataset.xAction === 'refresh') {
       event.preventDefault();
       window.location.assign(`${PRESALE_API_BASE}/api/integrations/x/oauth/start?purpose=verify-follow`);
+      return;
+    }
+    if (xConnectButton.dataset.xAction === 'repost') {
+      event.preventDefault();
+      window.location.assign(`${PRESALE_API_BASE}/api/integrations/x/oauth/start?purpose=repost`);
       return;
     }
     if (xConnectButton.dataset.xAction === 'follow') {
