@@ -381,6 +381,7 @@ async function apiRequest(path, options = {}){
 // X account connection is handled by the API so its OAuth credentials never
 // reach the browser. The status endpoint re-checks the current follow state.
 const xConnectButton = document.getElementById('x-connect-button');
+let xFollowRefreshAttempts = 0;
 
 function setXConnectLabel(label){
   const icon = xConnectButton?.querySelector('svg');
@@ -404,13 +405,19 @@ async function refreshXConnection(){
       cache: 'no-store',
     });
     const status = await response.json().catch(() => ({}));
-    if (!response.ok || !status.connected) return;
+    if (!response.ok || !status.connected) return false;
     xConnectButton.href = 'https://x.com/BattleCitiesHQ';
     xConnectButton.target = '_blank';
     xConnectButton.rel = 'noopener noreferrer';
     setXConnectLabel(status.follows ? 'X Connected · Following' : 'X Connected · Follow @BattleCitiesHQ');
+    if (!status.follows && xFollowRefreshAttempts < 2) {
+      xFollowRefreshAttempts += 1;
+      window.setTimeout(() => void refreshXConnection(), 20000);
+    }
+    return status.follows === true;
   } catch (error) {
     console.warn('Unable to check X connection.', error);
+    return false;
   }
   if (xConnectionResult === 'error') setXConnectLabel('X Connect Failed · Retry');
 }
