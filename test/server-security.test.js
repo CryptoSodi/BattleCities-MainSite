@@ -6,6 +6,8 @@ const { resolveStaticPath, server } = require('../server/server');
 test('static server exposes website assets but not backend or secret files', () => {
   assert.equal(path.basename(resolveStaticPath('/')), 'index.html');
   assert.equal(path.basename(resolveStaticPath('/whitepaper.html')), 'whitepaper.html');
+  assert.equal(path.basename(resolveStaticPath('/terms.html')), 'terms.html');
+  assert.equal(path.basename(resolveStaticPath('/privacy.html')), 'privacy.html');
   assert.equal(path.basename(resolveStaticPath('/output/pdf/battle-cities-whitepaper-v0.4.pdf')), 'battle-cities-whitepaper-v0.4.pdf');
   assert.equal(path.basename(resolveStaticPath('/css/style.css')), 'style.css');
   assert.equal(resolveStaticPath('/.env'), null);

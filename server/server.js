@@ -91,6 +91,8 @@ function resolveStaticPath(pathname) {
   }
   const publicPath = requested === '/index.html'
     || requested === '/whitepaper.html'
+    || requested === '/terms.html'
+    || requested === '/privacy.html'
     || requested === '/output/pdf/battle-cities-whitepaper-v0.4.pdf'
     || requested === '/test.html'
     || ['/css/', '/js/', '/images/'].some(prefix => requested.startsWith(prefix));
