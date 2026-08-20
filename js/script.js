@@ -411,20 +411,25 @@ function setXButtonAction(action){
   if (xConnectButton) xConnectButton.dataset.xAction = action;
 }
 
-async function refreshXConnection({ verifyFollow = false } = {}){
+async function refreshXConnection(){
   if (!xConnectButton) return;
   const params = new URLSearchParams(window.location.search);
-  const xConnectionResult = params.get('xConnected') ? 'connected' : params.get('xError');
+  const xConnectionResult = params.get('xConnected')
+    ? 'connected'
+    : params.get('xFollowVerified')
+      ? 'follow-verified'
+      : params.get('xError');
   if (xConnectionResult) {
     params.delete('xConnected');
+    params.delete('xFollowVerified');
     params.delete('xError');
     const search = params.toString();
     window.history.replaceState({}, '', `${window.location.pathname}${search ? `?${search}` : ''}${window.location.hash}`);
     if (xConnectionResult === 'connected') setXFollowRefreshReady(false);
+    if (xConnectionResult === 'follow-verified') setXFollowRefreshReady(true);
   }
   try {
     const statusUrl = new URL(`${PRESALE_API_BASE}/api/integrations/x/status`);
-    if (verifyFollow) statusUrl.searchParams.set('refresh', '1');
     const response = await fetch(statusUrl, {
       credentials: 'include',
       cache: 'no-store',
@@ -457,11 +462,7 @@ if (xConnectButton) {
   xConnectButton.addEventListener('click', (event) => {
     if (xConnectButton.dataset.xAction === 'refresh') {
       event.preventDefault();
-      xConnectButton.setAttribute('aria-busy', 'true');
-      setXConnectLabel('X Connected · Checking…');
-      void refreshXConnection({ verifyFollow: true }).finally(() => {
-        xConnectButton.removeAttribute('aria-busy');
-      });
+      window.location.assign(`${PRESALE_API_BASE}/api/integrations/x/oauth/start?purpose=verify-follow`);
       return;
     }
     if (xConnectButton.dataset.xAction === 'follow') {
