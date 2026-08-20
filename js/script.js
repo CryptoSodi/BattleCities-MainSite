@@ -379,9 +379,10 @@ async function apiRequest(path, options = {}){
 }
 
 // X account connection is handled by the API so its OAuth credentials never
-// reach the browser. The status endpoint re-checks the current follow state.
+// reach the browser. Reading status is free; a live X lookup only happens
+// after the player explicitly requests a refresh.
 const xConnectButton = document.getElementById('x-connect-button');
-let xFollowRefreshAttempts = 0;
+const X_FOLLOW_REFRESH_READY_KEY = 'battlecities.x-follow-refresh-ready';
 
 function setXConnectLabel(label){
   const icon = xConnectButton?.querySelector('svg');
@@ -389,7 +390,28 @@ function setXConnectLabel(label){
   xConnectButton.replaceChildren(icon, document.createTextNode(label));
 }
 
-async function refreshXConnection(){
+function canRefreshXFollow(){
+  try {
+    return window.localStorage.getItem(X_FOLLOW_REFRESH_READY_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function setXFollowRefreshReady(value){
+  try {
+    if (value) window.localStorage.setItem(X_FOLLOW_REFRESH_READY_KEY, '1');
+    else window.localStorage.removeItem(X_FOLLOW_REFRESH_READY_KEY);
+  } catch {
+    // Private browsing can deny storage. The current page still works.
+  }
+}
+
+function setXButtonAction(action){
+  if (xConnectButton) xConnectButton.dataset.xAction = action;
+}
+
+async function refreshXConnection({ verifyFollow = false } = {}){
   if (!xConnectButton) return;
   const params = new URLSearchParams(window.location.search);
   const xConnectionResult = params.get('xConnected') ? 'connected' : params.get('xError');
@@ -398,9 +420,12 @@ async function refreshXConnection(){
     params.delete('xError');
     const search = params.toString();
     window.history.replaceState({}, '', `${window.location.pathname}${search ? `?${search}` : ''}${window.location.hash}`);
+    if (xConnectionResult === 'connected') setXFollowRefreshReady(false);
   }
   try {
-    const response = await fetch(`${PRESALE_API_BASE}/api/integrations/x/status`, {
+    const statusUrl = new URL(`${PRESALE_API_BASE}/api/integrations/x/status`);
+    if (verifyFollow) statusUrl.searchParams.set('refresh', '1');
+    const response = await fetch(statusUrl, {
       credentials: 'include',
       cache: 'no-store',
     });
@@ -409,10 +434,16 @@ async function refreshXConnection(){
     xConnectButton.href = 'https://x.com/BattleCitiesHQ';
     xConnectButton.target = '_blank';
     xConnectButton.rel = 'noopener noreferrer';
-    setXConnectLabel(status.follows ? 'X Connected · Following' : 'X Connected · Follow @BattleCitiesHQ');
-    if (!status.follows && xFollowRefreshAttempts < 2) {
-      xFollowRefreshAttempts += 1;
-      window.setTimeout(() => void refreshXConnection(), 20000);
+    if (status.follows) {
+      setXFollowRefreshReady(false);
+      setXButtonAction('following');
+      setXConnectLabel('X Connected · Following');
+    } else if (canRefreshXFollow()) {
+      setXButtonAction('refresh');
+      setXConnectLabel('X Connected · Refresh Follow Status');
+    } else {
+      setXButtonAction('follow');
+      setXConnectLabel('X Connected · Follow @BattleCitiesHQ');
     }
     return status.follows === true;
   } catch (error) {
@@ -420,6 +451,25 @@ async function refreshXConnection(){
     return false;
   }
   if (xConnectionResult === 'error') setXConnectLabel('X Connect Failed · Retry');
+}
+
+if (xConnectButton) {
+  xConnectButton.addEventListener('click', (event) => {
+    if (xConnectButton.dataset.xAction === 'refresh') {
+      event.preventDefault();
+      xConnectButton.setAttribute('aria-busy', 'true');
+      setXConnectLabel('X Connected · Checking…');
+      void refreshXConnection({ verifyFollow: true }).finally(() => {
+        xConnectButton.removeAttribute('aria-busy');
+      });
+      return;
+    }
+    if (xConnectButton.dataset.xAction === 'follow') {
+      setXFollowRefreshReady(true);
+      setXButtonAction('refresh');
+      setXConnectLabel('X Connected · Refresh Follow Status');
+    }
+  });
 }
 
 refreshXConnection();
