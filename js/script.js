@@ -445,7 +445,11 @@ async function refreshXConnection(){
     if (status.follows && status.repostTask) {
       setXButtonAction('repost');
       xConnectButton.href = status.repostTask.postUrl;
-      setXConnectLabel(`REPOST · +${status.repostTask.rewardFuel} FUEL`);
+      setXConnectLabel(
+        xConnectionResult === 'repost'
+          ? 'REPOST FAILED · RETRY'
+          : `REPOST · +${status.repostTask.rewardFuel} FUEL`,
+      );
     } else if (status.follows) {
       setXFollowRefreshReady(false);
       setXButtonAction('following');
