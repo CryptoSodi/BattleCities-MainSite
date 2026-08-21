@@ -383,6 +383,8 @@ async function apiRequest(path, options = {}){
 // reach the browser. Reading status is free; a live X lookup only happens
 // after the player explicitly requests a refresh.
 const xConnectButton = document.getElementById('x-connect-button');
+const xRepostButton = document.getElementById('x-repost-button');
+const xCommentButton = document.getElementById('x-comment-button');
 const X_FOLLOW_REFRESH_READY_KEY = 'battlecities.x-follow-refresh-ready';
 const X_REPOST_VERIFY_READY_KEY = 'battlecities.x-repost-verify-ready';
 const X_COMMENT_VERIFY_READY_KEY = 'battlecities.x-comment-verify-ready';
@@ -432,6 +434,7 @@ function setXCommentVerifyReady(taskId){ try { if (taskId) window.localStorage.s
 function setXButtonAction(action){
   if (xConnectButton) xConnectButton.dataset.xAction = action;
 }
+function setMission(button,label,action,href,complete=false){if(!button)return;button.dataset.xAction=action;button.href=href||'#';button.setAttribute('aria-disabled',action==='locked'?'true':'false');button.closest('.x-mission')?.classList.toggle('is-locked',action==='locked');button.closest('.x-mission')?.classList.toggle('is-complete',complete);const icon=button.querySelector('svg');button.replaceChildren(icon,document.createTextNode(label));}
 
 async function refreshXConnection(){
   if (!xConnectButton) return;
@@ -461,6 +464,12 @@ async function refreshXConnection(){
       cache: 'no-store',
     });
     const status = await response.json().catch(() => ({}));
+    if (xRepostButton && xCommentButton) {
+const setTask=(task,button,type)=>{if(!status.follows||!task)return setMission(button,'NO ACTIVE TASK','locked');if(task.claimed)return setMission(button,`${type} CLAIMED · +5 FUEL`,'locked','',true);button.dataset.xTaskId=task.id;const ready=type==='REPOST'?canVerifyXRepost(task.id):canVerifyXComment(task.id);const action=ready?`verify-${type.toLowerCase()}`:type.toLowerCase();const href=type==='REPOST'?`https://x.com/intent/retweet?tweet_id=${encodeURIComponent(task.postId)}`:`https://x.com/intent/tweet?in_reply_to=${encodeURIComponent(task.postId)}`;setMission(button,ready?`VERIFY ${type} · +5 FUEL`:`${type} · +5 FUEL`,action,href);};
+      if(!status.connected){setMission(xConnectButton,'CONNECT X','connect','https://api.battlecities.com/api/integrations/x/oauth/start');setMission(xRepostButton,'LOCKED','locked');setMission(xCommentButton,'LOCKED','locked');return false;}
+      setMission(xConnectButton,status.follows?'FOLLOWED · +5 FUEL':canRefreshXFollow()?'VERIFY FOLLOW':'FOLLOW @BATTLECITIESHQ',status.follows?'following':canRefreshXFollow()?'refresh':'follow','https://x.com/BattleCitiesHQ',status.follows);
+      setTask(status.repostTask,xRepostButton,'REPOST');setTask(status.commentTask,xCommentButton,'COMMENT');return status.follows===true;
+    }
     if (!response.ok || !status.connected) return false;
     xConnectButton.href = 'https://x.com/BattleCitiesHQ';
     xConnectButton.target = '_blank';
@@ -537,6 +546,9 @@ if (xConnectButton) {
     }
   });
 }
+
+xRepostButton?.addEventListener('click',(event)=>{const action=xRepostButton.dataset.xAction;if(action==='repost'){setXRepostVerifyReady(xRepostButton.dataset.xTaskId||'');xRepostButton.dataset.xAction='verify-repost';return;}if(action==='verify-repost'){event.preventDefault();void verifyXRepost();}});
+xCommentButton?.addEventListener('click',(event)=>{const action=xCommentButton.dataset.xAction;if(action==='comment'){setXCommentVerifyReady(xCommentButton.dataset.xTaskId||'');xCommentButton.dataset.xAction='verify-comment';return;}if(action==='verify-comment'){event.preventDefault();void verifyXComment();}});
 
 async function verifyXFollow(){
   setXConnectLabel('VERIFYING X FOLLOW…');
