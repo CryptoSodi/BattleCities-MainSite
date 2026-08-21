@@ -383,6 +383,7 @@ async function apiRequest(path, options = {}){
 // after the player explicitly requests a refresh.
 const xConnectButton = document.getElementById('x-connect-button');
 const X_FOLLOW_REFRESH_READY_KEY = 'battlecities.x-follow-refresh-ready';
+const X_REPOST_VERIFY_READY_KEY = 'battlecities.x-repost-verify-ready';
 
 function setXConnectLabel(label){
   const icon = xConnectButton?.querySelector('svg');
@@ -402,6 +403,23 @@ function setXFollowRefreshReady(value){
   try {
     if (value) window.localStorage.setItem(X_FOLLOW_REFRESH_READY_KEY, '1');
     else window.localStorage.removeItem(X_FOLLOW_REFRESH_READY_KEY);
+  } catch {
+    // Private browsing can deny storage. The current page still works.
+  }
+}
+
+function canVerifyXRepost(taskId){
+  try {
+    return window.localStorage.getItem(X_REPOST_VERIFY_READY_KEY) === taskId;
+  } catch {
+    return false;
+  }
+}
+
+function setXRepostVerifyReady(taskId){
+  try {
+    if (taskId) window.localStorage.setItem(X_REPOST_VERIFY_READY_KEY, taskId);
+    else window.localStorage.removeItem(X_REPOST_VERIFY_READY_KEY);
   } catch {
     // Private browsing can deny storage. The current page still works.
   }
@@ -430,6 +448,7 @@ async function refreshXConnection(){
     window.history.replaceState({}, '', `${window.location.pathname}${search ? `?${search}` : ''}${window.location.hash}`);
     if (xConnectionResult === 'connected') setXFollowRefreshReady(false);
     if (xConnectionResult === 'follow-verified') setXFollowRefreshReady(true);
+    if (xConnectionResult === 'repost-claimed') setXRepostVerifyReady('');
   }
   try {
     const statusUrl = new URL(`${PRESALE_API_BASE}/api/integrations/x/status`);
@@ -443,14 +462,17 @@ async function refreshXConnection(){
     xConnectButton.target = '_blank';
     xConnectButton.rel = 'noopener noreferrer';
     if (status.follows && status.repostTask) {
-      setXButtonAction('repost');
+      const verifyReady = canVerifyXRepost(status.repostTask.id);
+      setXButtonAction(verifyReady ? 'verify-repost' : 'repost');
+      xConnectButton.dataset.xTaskId = status.repostTask.id;
       xConnectButton.href = status.repostTask.postUrl;
       setXConnectLabel(
-        xConnectionResult === 'repost'
-          ? 'REPOST FAILED · RETRY'
+        verifyReady
+          ? `VERIFY REPOST · +${status.repostTask.rewardFuel} FUEL`
           : `REPOST · +${status.repostTask.rewardFuel} FUEL`,
       );
     } else if (status.follows) {
+      delete xConnectButton.dataset.xTaskId;
       setXFollowRefreshReady(false);
       setXButtonAction('following');
       setXConnectLabel('X Connected · Following');
@@ -473,12 +495,19 @@ if (xConnectButton) {
   xConnectButton.addEventListener('click', (event) => {
     if (xConnectButton.dataset.xAction === 'refresh') {
       event.preventDefault();
-      window.location.assign(`${PRESALE_API_BASE}/api/integrations/x/oauth/start?purpose=verify-follow`);
+      void verifyXFollow();
       return;
     }
     if (xConnectButton.dataset.xAction === 'repost') {
+      const taskId = xConnectButton.dataset.xTaskId;
+      if (taskId) setXRepostVerifyReady(taskId);
+      setXButtonAction('verify-repost');
+      setXConnectLabel('VERIFY REPOST · +5 FUEL');
+      return;
+    }
+    if (xConnectButton.dataset.xAction === 'verify-repost') {
       event.preventDefault();
-      window.location.assign(`${PRESALE_API_BASE}/api/integrations/x/oauth/start?purpose=repost`);
+      void verifyXRepost();
       return;
     }
     if (xConnectButton.dataset.xAction === 'follow') {
@@ -487,6 +516,38 @@ if (xConnectButton) {
       setXConnectLabel('X Connected · Refresh Follow Status');
     }
   });
+}
+
+async function verifyXFollow(){
+  setXConnectLabel('VERIFYING X FOLLOW…');
+  try {
+    const result = await apiFetch(`${PRESALE_API_BASE}/api/integrations/x/verify-follow`, { method: 'POST' });
+    if (!result.follows) {
+      setXConnectLabel('NOT FOLLOWING · RETURN TO X');
+      return;
+    }
+    setXFollowRefreshReady(false);
+    await refreshXConnection();
+  } catch (error) {
+    console.warn('Unable to verify X follow.', error);
+    setXConnectLabel('FOLLOW CHECK FAILED · RETRY');
+  }
+}
+
+async function verifyXRepost(){
+  setXConnectLabel('VERIFYING REPOST…');
+  try {
+    const result = await apiFetch(`${PRESALE_API_BASE}/api/integrations/x/verify-repost`, { method: 'POST' });
+    if (!result.reposted) {
+      setXConnectLabel('REPOST NOT FOUND · WAIT & RETRY');
+      return;
+    }
+    if (result.rewardGranted) setXRepostVerifyReady('');
+    await refreshXConnection();
+  } catch (error) {
+    console.warn('Unable to verify X repost.', error);
+    setXConnectLabel('REPOST CHECK FAILED · RETRY');
+  }
 }
 
 refreshXConnection();
