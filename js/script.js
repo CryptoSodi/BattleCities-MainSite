@@ -463,6 +463,12 @@ async function refreshXConnection(){
     xConnectButton.target = '_blank';
     xConnectButton.rel = 'noopener noreferrer';
     if (status.follows && status.repostTask) {
+      if (status.repostTask.claimed) {
+        delete xConnectButton.dataset.xTaskId;
+        setXButtonAction('following');
+        setXConnectLabel('X Connected · Repost Reward Claimed');
+        return true;
+      }
       const verifyReady = canVerifyXRepost(status.repostTask.id);
       setXButtonAction(verifyReady ? 'verify-repost' : 'repost');
       xConnectButton.dataset.xTaskId = status.repostTask.id;
