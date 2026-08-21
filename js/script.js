@@ -370,6 +370,7 @@ async function verifyAllocation(signature, quoteToken){
 async function apiRequest(path, options = {}){
   const response = await fetch(`${PRESALE_API_BASE}${path}`, {
     cache: 'no-store',
+    credentials: 'include',
     ...options,
     headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
   });
@@ -521,7 +522,7 @@ if (xConnectButton) {
 async function verifyXFollow(){
   setXConnectLabel('VERIFYING X FOLLOW…');
   try {
-    const result = await apiFetch(`${PRESALE_API_BASE}/api/integrations/x/verify-follow`, { method: 'POST' });
+    const result = await apiRequest('/api/integrations/x/verify-follow', { method: 'POST' });
     if (!result.follows) {
       setXConnectLabel('NOT FOLLOWING · RETURN TO X');
       return;
@@ -537,7 +538,7 @@ async function verifyXFollow(){
 async function verifyXRepost(){
   setXConnectLabel('VERIFYING REPOST…');
   try {
-    const result = await apiFetch(`${PRESALE_API_BASE}/api/integrations/x/verify-repost`, { method: 'POST' });
+    const result = await apiRequest('/api/integrations/x/verify-repost', { method: 'POST' });
     if (!result.reposted) {
       setXConnectLabel('REPOST NOT FOUND · WAIT & RETRY');
       return;
