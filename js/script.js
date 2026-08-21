@@ -466,7 +466,9 @@ async function refreshXConnection(){
       const verifyReady = canVerifyXRepost(status.repostTask.id);
       setXButtonAction(verifyReady ? 'verify-repost' : 'repost');
       xConnectButton.dataset.xTaskId = status.repostTask.id;
-      xConnectButton.href = status.repostTask.postUrl;
+      // Open X's native repost confirmation rather than making the player
+      // find the repost action on the task post themselves.
+      xConnectButton.href = `https://x.com/intent/retweet?tweet_id=${encodeURIComponent(status.repostTask.postId)}`;
       setXConnectLabel(
         verifyReady
           ? `VERIFY REPOST · +${status.repostTask.rewardFuel} FUEL`
