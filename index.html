@@ -77,19 +77,26 @@ try {
 <!-- ================= HERO ================= -->
 <section class="hero" id="hero">
   <div class="hero-inner">
-    <div class="hero-copy">
-      <div class="eyebrow"><span class="pulse"></span> SOLANA / PRESALE LIVE</div>
-      <div class="hero-title-row"><img class="hero-game-logo" src="images/battle-cities-menu-logo.png" width="1280" height="1280" alt=""><h1><span class="glitch" data-text="BATTLE">BATTLE</span><br><span class="hero-cities">CITIES</span></h1></div>
-      <p class="hero-sub">
-        The <b>$BATC</b> game token on <b>Solana</b>. Fast, low-cost, and built for a community that never stops battling. Secure your presale allocation before the price rises to the next stage.
-      </p>
-      <div class="hero-actions">
-        <a href="https://play.battlecities.com/" class="btn btn-play" data-deployment-url="https://play.battlecities.com/" data-deployment-sector="01" aria-label="Play Battle Cities">
-          <svg data-lucide="gamepad-2" class="icon"></svg>Play Game
-        </a>
-        <a href="#purchase" class="btn btn-primary"><svg data-lucide="rocket" class="icon"></svg>Join Presale</a>
-        <a href="#tokenomics" class="btn btn-ghost"><svg data-lucide="pie-chart" class="icon"></svg>View Tokenomics</a>
+    <div class="hero-main">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="pulse"></span> SOLANA / PRESALE LIVE</div>
+        <div class="hero-title-row"><img class="hero-game-logo" src="images/battle-cities-menu-logo.png" width="1280" height="1280" alt=""><h1><span class="glitch" data-text="BATTLE">BATTLE</span><br><span class="hero-cities">CITIES</span></h1></div>
+        <p class="hero-sub">
+          The <b>$BATC</b> game token on <b>Solana</b>. Fast, low-cost, and built for a community that never stops battling. Secure your presale allocation before the price rises to the next stage.
+        </p>
+        <div class="hero-actions">
+          <a href="https://play.battlecities.com/" class="btn btn-play" data-deployment-url="https://play.battlecities.com/" data-deployment-sector="01" aria-label="Play Battle Cities">
+            <svg data-lucide="gamepad-2" class="icon"></svg>Play Game
+          </a>
+          <a href="#purchase" class="btn btn-primary"><svg data-lucide="rocket" class="icon"></svg>Join Presale</a>
+          <a href="#tokenomics" class="btn btn-ghost"><svg data-lucide="pie-chart" class="icon"></svg>View Tokenomics</a>
+        </div>
       </div>
+      <div class="hero-media">
+        <img src="images/hero.png" alt="BattleCities console">
+      </div>
+    </div>
+    <div class="hero-lower">
       <section class="x-missions" aria-label="Battle Cities X missions">
         <div class="x-missions__head"><span class="pulse"></span><span> SOCIAL MISSIONS · X TASKS PAY 5 FUEL</span></div>
         <div class="x-missions__grid">
@@ -99,25 +106,24 @@ try {
           <article class="x-mission" data-x-mission="discord"><span class="x-mission__step">04</span><div><b>Join Battle Cities Discord</b><small>Meet the community and receive campaign updates.</small></div><a href="https://discord.gg/jHmYTCVJgm" class="btn btn-ghost x-mission__action" target="_blank" rel="noopener noreferrer"><svg data-lucide="messages-square" class="icon" aria-hidden="true"></svg>Join Discord</a></article>
         </div>
       </section>
-      <a
-        class="hero-dapp-store"
-        href="https://r2.solanamobiledappstore.com/a/6e41f0b957c7f1053479a79fa2bdf3e714e0ae68cc1f876f48b83c7d74239b55.apk"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Get Battle Cities on the Solana dApp Store"
-      >
-        <img src="images/solana-dapp-store.png" alt="Get it on Solana dApp Store" width="465" height="160">
-      </a>
-      <!-- Quick-glance stats row -->
-      <div class="hero-stats">
-        <div><div class="num"><svg data-lucide="trending-up" class="icon"></svg><span class="text-white" id="hero-current-price">$0.005</span></div><div class="lbl">Current Price</div></div>
-        <div><div class="num"><svg data-lucide="coins" class="icon"></svg><span class="text-white">50M</span></div><div class="lbl">Total Supply</div></div>
-        <div><div class="num"><svg data-lucide="flame" class="icon"></svg><span class="text-white" id="hero-presale-sold">--</span></div><div class="lbl">Presale Sold</div></div>
-        <div><div class="num"><svg data-lucide="shield-alert" class="icon"></svg><span class="text-white">SOLANA</span></div><div class="lbl">Network</div></div>
+      <div class="hero-details">
+        <a
+          class="hero-dapp-store"
+          href="https://r2.solanamobiledappstore.com/a/6e41f0b957c7f1053479a79fa2bdf3e714e0ae68cc1f876f48b83c7d74239b55.apk"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Get Battle Cities on the Solana dApp Store"
+        >
+          <img src="images/solana-dapp-store.png" alt="Get it on Solana dApp Store" width="465" height="160">
+        </a>
+        <!-- Quick-glance stats row -->
+        <div class="hero-stats">
+          <div><div class="num"><svg data-lucide="trending-up" class="icon"></svg><span class="text-white" id="hero-current-price">$0.005</span></div><div class="lbl">Current Price</div></div>
+          <div><div class="num"><svg data-lucide="coins" class="icon"></svg><span class="text-white">50M</span></div><div class="lbl">Total Supply</div></div>
+          <div><div class="num"><svg data-lucide="flame" class="icon"></svg><span class="text-white" id="hero-presale-sold">--</span></div><div class="lbl">Presale Sold</div></div>
+          <div><div class="num"><svg data-lucide="shield-alert" class="icon"></svg><span class="text-white">SOLANA</span></div><div class="lbl">Network</div></div>
+        </div>
       </div>
-    </div>
-    <div class="hero-media">
-      <img src="images/hero.png" alt="BattleCities console">
     </div>
   </div>
 </section>
