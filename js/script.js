@@ -466,7 +466,7 @@ async function refreshXConnection(){
     const status = await response.json().catch(() => ({}));
     if (xRepostButton && xCommentButton) {
       const missions = document.querySelector('.x-missions');
-      document.querySelectorAll('[data-x-mission="repost"], [data-x-mission="comment"], [data-x-mission="discord"]').forEach((item) => {
+      document.querySelectorAll('[data-x-mission="repost"], [data-x-mission="comment"]').forEach((item) => {
         item.hidden = !status.connected;
       });
       missions?.classList.toggle('is-connect-only', !status.connected);
