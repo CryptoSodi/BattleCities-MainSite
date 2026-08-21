@@ -385,6 +385,7 @@ async function apiRequest(path, options = {}){
 const xConnectButton = document.getElementById('x-connect-button');
 const X_FOLLOW_REFRESH_READY_KEY = 'battlecities.x-follow-refresh-ready';
 const X_REPOST_VERIFY_READY_KEY = 'battlecities.x-repost-verify-ready';
+const X_COMMENT_VERIFY_READY_KEY = 'battlecities.x-comment-verify-ready';
 
 function setXConnectLabel(label){
   const icon = xConnectButton?.querySelector('svg');
@@ -425,6 +426,8 @@ function setXRepostVerifyReady(taskId){
     // Private browsing can deny storage. The current page still works.
   }
 }
+function canVerifyXComment(taskId){ try { return window.localStorage.getItem(X_COMMENT_VERIFY_READY_KEY) === taskId; } catch { return false; } }
+function setXCommentVerifyReady(taskId){ try { if (taskId) window.localStorage.setItem(X_COMMENT_VERIFY_READY_KEY, taskId); else window.localStorage.removeItem(X_COMMENT_VERIFY_READY_KEY); } catch {} }
 
 function setXButtonAction(action){
   if (xConnectButton) xConnectButton.dataset.xAction = action;
@@ -462,7 +465,13 @@ async function refreshXConnection(){
     xConnectButton.href = 'https://x.com/BattleCitiesHQ';
     xConnectButton.target = '_blank';
     xConnectButton.rel = 'noopener noreferrer';
-    if (status.follows && status.repostTask) {
+    if (status.follows && status.commentTask && !status.commentTask.claimed) {
+      const ready = canVerifyXComment(status.commentTask.id);
+      setXButtonAction(ready ? 'verify-comment' : 'comment');
+      xConnectButton.dataset.xTaskId = status.commentTask.id;
+      xConnectButton.href = `https://x.com/intent/tweet?in_reply_to=${encodeURIComponent(status.commentTask.postId)}`;
+      setXConnectLabel(ready ? `VERIFY COMMENT · +${status.commentTask.rewardFuel} FUEL` : `COMMENT · +${status.commentTask.rewardFuel} FUEL`);
+    } else if (status.follows && status.repostTask) {
       if (status.repostTask.claimed) {
         delete xConnectButton.dataset.xTaskId;
         setXButtonAction('following');
@@ -514,6 +523,8 @@ if (xConnectButton) {
       setXConnectLabel('VERIFY REPOST · +5 FUEL');
       return;
     }
+    if (xConnectButton.dataset.xAction === 'comment') { const taskId=xConnectButton.dataset.xTaskId; if(taskId)setXCommentVerifyReady(taskId); setXButtonAction('verify-comment'); setXConnectLabel('VERIFY COMMENT · +5 FUEL'); return; }
+    if (xConnectButton.dataset.xAction === 'verify-comment') { event.preventDefault(); void verifyXComment(); return; }
     if (xConnectButton.dataset.xAction === 'verify-repost') {
       event.preventDefault();
       void verifyXRepost();
@@ -557,6 +568,12 @@ async function verifyXRepost(){
     console.warn('Unable to verify X repost.', error);
     setXConnectLabel('REPOST CHECK FAILED · RETRY');
   }
+}
+
+async function verifyXComment(){
+  setXConnectLabel('VERIFYING COMMENT…');
+  try { const result=await apiRequest('/api/integrations/x/verify-comment',{method:'POST'}); if(!result.commented){setXConnectLabel('COMMENT NOT FOUND · WAIT & RETRY');return;} if(result.rewardGranted)setXCommentVerifyReady(''); await refreshXConnection(); }
+  catch(error){ console.warn('Unable to verify X comment.',error); setXConnectLabel('COMMENT CHECK FAILED · RETRY'); }
 }
 
 refreshXConnection();
