@@ -385,6 +385,7 @@ async function apiRequest(path, options = {}){
 const xConnectButton = document.getElementById('x-connect-button');
 const xRepostButton = document.getElementById('x-repost-button');
 const xCommentButton = document.getElementById('x-comment-button');
+const discordVerifyButton = document.getElementById('discord-verify-button');
 const X_FOLLOW_REFRESH_READY_KEY = 'battlecities.x-follow-refresh-ready';
 const X_REPOST_VERIFY_READY_KEY = 'battlecities.x-repost-verify-ready';
 const X_COMMENT_VERIFY_READY_KEY = 'battlecities.x-comment-verify-ready';
@@ -434,7 +435,18 @@ function setXCommentVerifyReady(taskId){ try { if (taskId) window.localStorage.s
 function setXButtonAction(action){
   if (xConnectButton) xConnectButton.dataset.xAction = action;
 }
-function setMission(button,label,action,href,complete=false){if(!button)return;button.dataset.xAction=action;button.href=href||'#';button.setAttribute('aria-disabled',action==='locked'?'true':'false');button.closest('.x-mission')?.classList.toggle('is-locked',action==='locked');button.closest('.x-mission')?.classList.toggle('is-complete',complete);const icon=button.querySelector('svg');button.replaceChildren(icon,document.createTextNode(label));}
+function setMission(button,label,action,href,complete=false){if(!button)return;button.dataset.xAction=action;button.href=href||'#';button.setAttribute('aria-disabled',action==='locked'?'true':'false');const opensExternally=['connect','follow','following','repost','comment','discord-verify'].includes(action);if(opensExternally){button.target='_blank';button.rel='noopener noreferrer';}else{button.removeAttribute('target');button.removeAttribute('rel');}button.closest('.x-mission')?.classList.toggle('is-locked',action==='locked');button.closest('.x-mission')?.classList.toggle('is-complete',complete);const icon=button.querySelector('svg');button.replaceChildren(icon,document.createTextNode(label));}
+
+async function refreshDiscordMission(){
+  if(!discordVerifyButton)return;
+  try{
+    const response=await fetch(`${PRESALE_API_BASE}/api/integrations/discord/verification`,{credentials:'include',cache:'no-store'});
+    const status=await response.json().catch(()=>({}));
+    if(!response.ok||!status.authenticated){setMission(discordVerifyButton,'LOGIN REQUIRED','locked');return;}
+    if(status.verified){setMission(discordVerifyButton,status.rewardClaimed?'VERIFIED · +5 FUEL':'CLAIM · +5 FUEL',status.rewardClaimed?'verified':'discord-claim','',status.rewardClaimed);return;}
+    setMission(discordVerifyButton,'JOIN & VERIFY · +5 FUEL','discord-verify',`${PRESALE_API_BASE}/api/integrations/discord/oauth/start`);
+  }catch(error){console.warn('Unable to check Discord verification.',error);setMission(discordVerifyButton,'DISCORD UNAVAILABLE','locked');}
+}
 
 async function refreshXConnection(){
   if (!xConnectButton) return;
@@ -549,6 +561,14 @@ if (xConnectButton) {
 
 xRepostButton?.addEventListener('click',(event)=>{const action=xRepostButton.dataset.xAction;if(action==='repost'){setXRepostVerifyReady(xRepostButton.dataset.xTaskId||'');xRepostButton.dataset.xAction='verify-repost';return;}if(action==='verify-repost'){event.preventDefault();void verifyXRepost();}});
 xCommentButton?.addEventListener('click',(event)=>{const action=xCommentButton.dataset.xAction;if(action==='comment'){setXCommentVerifyReady(xCommentButton.dataset.xTaskId||'');xCommentButton.dataset.xAction='verify-comment';return;}if(action==='verify-comment'){event.preventDefault();void verifyXComment();}});
+discordVerifyButton?.addEventListener('click',(event)=>{if(discordVerifyButton.dataset.xAction!=='discord-claim')return;event.preventDefault();void claimDiscordFuel();});
+window.addEventListener('focus',()=>{void refreshDiscordMission();});
+
+async function claimDiscordFuel(){
+  setMission(discordVerifyButton,'CLAIMING FUEL…','locked');
+  try{await apiRequest('/api/integrations/discord/claim-reward',{method:'POST'});await refreshDiscordMission();}
+  catch(error){console.warn('Unable to claim Discord Fuel.',error);setMission(discordVerifyButton,'CLAIM FAILED · RETRY','discord-claim');}
+}
 
 async function verifyXFollow(){
   setXConnectLabel('VERIFYING X FOLLOW…');
@@ -589,6 +609,7 @@ async function verifyXComment(){
 }
 
 refreshXConnection();
+refreshDiscordMission();
 
 function renderStage(stage){
   const row = document.querySelector(`[data-stage-id="${stage.id}"]`);
