@@ -444,7 +444,7 @@ async function refreshDiscordMission(){
     const response=await fetch(`${PRESALE_API_BASE}/api/integrations/discord/verification`,{credentials:'include',cache:'no-store'});
     const status=await response.json().catch(()=>({}));
     if(!response.ok||!status.authenticated){setMission(discordVerifyButton,'LOGIN REQUIRED','locked');return;}
-    if(status.verified){setMission(discordVerifyButton,status.rewardClaimed?'VERIFIED':'CLAIM FUEL',status.rewardClaimed?'verified':'discord-claim','',status.rewardClaimed);return;}
+    if(status.verified){setMission(discordVerifyButton,status.rewardClaimed?'VERIFIED':'CLAIM FUEL',status.rewardClaimed?'locked':'discord-claim','',status.rewardClaimed);return;}
     setMission(discordVerifyButton,'JOIN & VERIFY · +5 FUEL','discord-verify',`${PRESALE_API_BASE}/api/integrations/discord/oauth/start`);
   }catch(error){console.warn('Unable to check Discord verification.',error);setMission(discordVerifyButton,'DISCORD UNAVAILABLE','locked');}
 }
