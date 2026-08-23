@@ -444,7 +444,7 @@ async function refreshDiscordMission(){
     const response=await fetch(`${PRESALE_API_BASE}/api/integrations/discord/verification`,{credentials:'include',cache:'no-store'});
     const status=await response.json().catch(()=>({}));
     if(!response.ok||!status.authenticated){setMission(discordVerifyButton,'LOGIN REQUIRED','locked');return;}
-    if(status.verified){setMission(discordVerifyButton,status.rewardClaimed?'VERIFIED · +5 FUEL':'CLAIM · +5 FUEL',status.rewardClaimed?'verified':'discord-claim','',status.rewardClaimed);return;}
+    if(status.verified){setMission(discordVerifyButton,status.rewardClaimed?'VERIFIED':'CLAIM FUEL',status.rewardClaimed?'verified':'discord-claim','',status.rewardClaimed);return;}
     setMission(discordVerifyButton,'JOIN & VERIFY · +5 FUEL','discord-verify',`${PRESALE_API_BASE}/api/integrations/discord/oauth/start`);
   }catch(error){console.warn('Unable to check Discord verification.',error);setMission(discordVerifyButton,'DISCORD UNAVAILABLE','locked');}
 }
@@ -478,9 +478,9 @@ async function refreshXConnection(){
     });
     const status = await response.json().catch(() => ({}));
     if (xRepostButton && xCommentButton) {
-      const setTask=(task,button,type)=>{if(!status.follows||!task)return setMission(button,'NO ACTIVE TASK','locked');if(task.claimed)return setMission(button,`${type} CLAIMED · +5 FUEL`,'locked','',true);button.dataset.xTaskId=task.id;const ready=type==='REPOST'?canVerifyXRepost(task.id):canVerifyXComment(task.id);const action=ready?`verify-${type.toLowerCase()}`:type.toLowerCase();const href=type==='REPOST'?`https://x.com/intent/retweet?tweet_id=${encodeURIComponent(task.postId)}`:`https://x.com/intent/tweet?in_reply_to=${encodeURIComponent(task.postId)}`;setMission(button,ready?`VERIFY ${type} · +5 FUEL`:`${type} · +5 FUEL`,action,href);};
+      const setTask=(task,button,type)=>{if(!status.follows||!task)return setMission(button,'NO ACTIVE TASK','locked');if(task.claimed)return setMission(button,type==='REPOST'?'REPOSTED':'COMMENTED','locked','',true);button.dataset.xTaskId=task.id;const ready=type==='REPOST'?canVerifyXRepost(task.id):canVerifyXComment(task.id);const action=ready?`verify-${type.toLowerCase()}`:type.toLowerCase();const href=type==='REPOST'?`https://x.com/intent/retweet?tweet_id=${encodeURIComponent(task.postId)}`:`https://x.com/intent/tweet?in_reply_to=${encodeURIComponent(task.postId)}`;setMission(button,ready?`VERIFY ${type} · +5 FUEL`:`${type} · +5 FUEL`,action,href);};
       if(!status.connected){setMission(xConnectButton,'CONNECT X','connect','https://api.battlecities.com/api/integrations/x/oauth/start');setMission(xRepostButton,'LOCKED','locked');setMission(xCommentButton,'LOCKED','locked');return false;}
-      setMission(xConnectButton,status.follows?'FOLLOWED · +5 FUEL':canRefreshXFollow()?'VERIFY FOLLOW':'FOLLOW @BATTLECITIESHQ',status.follows?'following':canRefreshXFollow()?'refresh':'follow','https://x.com/BattleCitiesHQ',status.follows);
+      setMission(xConnectButton,status.follows?'FOLLOWED':canRefreshXFollow()?'VERIFY FOLLOW':'FOLLOW @BATTLECITIESHQ',status.follows?'following':canRefreshXFollow()?'refresh':'follow','https://x.com/BattleCitiesHQ',status.follows);
       setTask(status.repostTask,xRepostButton,'REPOST');setTask(status.commentTask,xCommentButton,'COMMENT');return status.follows===true;
     }
     if (!response.ok || !status.connected) return false;
