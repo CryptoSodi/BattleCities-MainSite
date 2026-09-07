@@ -95,7 +95,12 @@ function beginDeployment(event){
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (arrival) {
-    try { window.sessionStorage.setItem(DEPLOYMENT_ARRIVAL_KEY, arrival); } catch {}
+    try {
+      const target = new URL(destination, window.location.href);
+      if (target.origin === window.location.origin) {
+        window.sessionStorage.setItem(DEPLOYMENT_ARRIVAL_KEY, arrival);
+      }
+    } catch {}
     overlay.classList.add('is-departing');
     deploymentTimer = window.setTimeout(
       () => window.location.assign(destination),
