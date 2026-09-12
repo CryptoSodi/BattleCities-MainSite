@@ -663,12 +663,14 @@ function renderPresaleState(state){
   const stageProgress = allocation > 0 ? soldInStage / allocation * 100 : 0;
   const combinedProgress = totalAllocation > 0 ? totalSold / totalAllocation * 100 : 0;
   renderProgress(stageProgress);
-  document.getElementById('hero-presale-sold').textContent = `${Math.round(combinedProgress)}%`;
+  const heroPresaleSold = document.getElementById('hero-presale-sold');
+  if (heroPresaleSold) heroPresaleSold.textContent = `${Math.round(combinedProgress)}%`;
   state.stages.forEach(renderStage);
 
   const currentPrice = `${formatSol(presaleState.currentPriceSol)} SOL`;
   document.getElementById('token-price').textContent = currentPrice;
-  document.getElementById('hero-current-price').textContent = currentPrice;
+  const heroCurrentPrice = document.getElementById('hero-current-price');
+  if (heroCurrentPrice) heroCurrentPrice.textContent = currentPrice;
   updateRateText();
   calc();
 

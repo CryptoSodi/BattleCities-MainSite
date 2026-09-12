@@ -62,7 +62,6 @@ try {
         <span class="presence-divider" aria-hidden="true">·</span>
         <span id="in-game-count">--</span> PLAYING
       </div>
-      <a href="#purchase" class="navcta"><svg data-lucide="zap" class="icon"></svg>Buy $BATC</a>
     </div>
   </div>
 </nav>
@@ -79,16 +78,15 @@ try {
   <div class="hero-inner">
     <div class="hero-main">
       <div class="hero-copy">
-        <div class="eyebrow"><span class="pulse"></span> SOLANA / PRESALE LIVE</div>
+        <div class="eyebrow"><span class="pulse"></span> SOLANA / GAME LIVE</div>
         <div class="hero-title-row"><h1><span class="glitch" data-text="BATTLE">BATTLE</span><br><span class="hero-cities">CITIES</span></h1></div>
         <p class="hero-sub">
-          The <b>$BATC</b> game token on <b>Solana</b>. Fast, low-cost, and built for a community that never stops battling. Secure your presale allocation before the price rises to the next stage.
+          BattleCities brings tactical arcade action and a player-powered economy to <b>Solana</b>. Build your loadout, battle for high scores, and rise through the ranks.
         </p>
         <div class="hero-actions">
           <a href="https://play.battlecities.com/?arrival=main-site" class="btn btn-play" data-deployment-url="https://play.battlecities.com/?arrival=main-site" data-deployment-arrival="game" data-deployment-sector="01" aria-label="Play Battle Cities">
             <svg data-lucide="gamepad-2" class="icon"></svg>Play Game
           </a>
-          <a href="#purchase" class="btn btn-primary"><svg data-lucide="rocket" class="icon"></svg>Join Presale</a>
           <a href="#tokenomics" class="btn btn-ghost"><svg data-lucide="pie-chart" class="icon"></svg>View Tokenomics</a>
         </div>
       </div>
@@ -130,9 +128,7 @@ try {
         </a>
         <!-- Quick-glance stats row -->
         <div class="hero-stats">
-          <div><div class="num"><svg data-lucide="trending-up" class="icon"></svg><span class="text-white" id="hero-current-price">$0.005</span></div><div class="lbl">Current Price</div></div>
           <div><div class="num"><svg data-lucide="coins" class="icon"></svg><span class="text-white">50M</span></div><div class="lbl">Total Supply</div></div>
-          <div><div class="num"><svg data-lucide="flame" class="icon"></svg><span class="text-white" id="hero-presale-sold">--</span></div><div class="lbl">Presale Sold</div></div>
           <div><div class="num"><svg data-lucide="shield-alert" class="icon"></svg><span class="text-white">SOLANA</span></div><div class="lbl">Network</div></div>
         </div>
       </div>
@@ -182,18 +178,12 @@ try {
     <div>
       <!-- Allocation bars are injected here dynamically by script.js -->
       <div class="alloc-list reveal" id="alloc-list"></div>
-      <div class="risk-box pixel-frame danger reveal">
-        <div class="pixel-frame-inner risk-inner">
-          <svg data-lucide="triangle-alert" class="icon-lg"></svg>
-          <p><b>PRIVATE PRESALE ACCESS.</b> Join the private presale before the public sale begins&mdash;public-sale pricing will be higher. Review the token details and risks before participating.</p>
-        </div>
-      </div>
     </div>
   </div>
 </section>
 
 <!-- ================= BUY / PURCHASE FLOW ================= -->
-<section id="purchase">
+<section id="purchase" hidden>
   <!-- Numbers below (cd-d / cd-h / cd-m / cd-s) are updated every second by script.js -->
   <div class="purchase-deadline reveal" aria-label="Presale deadline">
     <div class="sec-tag center"><svg data-lucide="timer" class="icon"></svg>Presale Deadline</div>
@@ -252,12 +242,6 @@ try {
               <span class="price" data-stage-price>$0.0135</span>
               <span class="stage-value" data-stage-sold>--</span>
               <span class="stage-value" data-stage-remaining>--</span>
-            </div>
-            <div class="stage">
-              <span class="tag"><svg data-lucide="rocket" class="icon"></svg>DEX Launch</span>
-              <span class="price">TBA</span>
-              <span class="stage-value">&mdash;</span>
-              <span class="stage-value">&mdash;</span>
             </div>
             <div class="stage stage-total">
               <span>Total</span><span></span><span id="total-sold">--</span><span id="total-available">--</span>
@@ -388,30 +372,6 @@ try {
         <p>BattleCities arrives on Solana Seeker for the Solana mobile community.</p>
       </div>
     </div>
-    <div class="tl-item done reveal">
-      <div class="tl-dot"></div>
-      <div class="tl-marker mono">Jun–Jul 2026</div>
-      <div class="tl-body">
-        <h3><svg data-lucide="shield-check" class="icon"></svg>Presale Readiness</h3>
-        <p>Wallet flows, allocation tooling, and settlement are validated ahead of the public presale.</p>
-      </div>
-    </div>
-    <div class="tl-item now reveal">
-      <div class="tl-dot"></div>
-      <div class="tl-marker mono">Aug 2026</div>
-      <div class="tl-body">
-        <h3><svg data-lucide="flame" class="icon"></svg>Presale — Stage 1 (Now)</h3>
-        <p>Stage 1 is live. Secure your BATC allocation before the next pricing stage opens.</p>
-      </div>
-    </div>
-    <div class="tl-item next reveal">
-      <div class="tl-dot"></div>
-      <div class="tl-marker mono">Sep 2026</div>
-      <div class="tl-body">
-        <h3><svg data-lucide="rocket" class="icon"></svg>DEX Listing</h3>
-        <p>Liquidity goes live and BATC becomes available for public trading on a decentralized exchange.</p>
-      </div>
-    </div>
     <div class="tl-item next reveal">
       <div class="tl-dot"></div>
       <div class="tl-marker mono">Oct 2026</div>
@@ -436,7 +396,7 @@ try {
   <div class="sec-head reveal">
     <div class="sec-tag"><svg data-lucide="help-circle" class="icon"></svg>Need To Know</div>
     <h2>Frequently Asked Questions</h2>
-    <p>Straight answers before you deploy — read this before you buy $BATC.</p>
+    <p>Straight answers about the game, token utility, and community.</p>
   </div>
 
   <!-- name="faq-group" makes only one <details> open at a time natively; script.js adds a JS fallback -->
@@ -449,13 +409,6 @@ try {
       <div class="faq-answer">$BATC is the planned BattleCities SPL token on Solana with a fixed 50,000,000 supply. The mint address will be published when the token launches—ignore any address shared before that announcement.</div>
     </details>
 
-    <details class="faq-item" name="faq-group">
-      <summary>
-        <span class="faq-q"><svg data-lucide="layers" class="icon q-icon"></svg>How does the presale work?</span>
-        <svg data-lucide="chevron-down" class="icon chev"></svg>
-      </summary>
-      <div class="faq-answer">The presale runs in fixed-price stages. A stage changes only when its BATC allocation sells out. The entire presale closes when the countdown reaches zero, even if the current stage still has tokens available.</div>
-    </details>
 
     <details class="faq-item" name="faq-group">
       <summary>
@@ -465,13 +418,6 @@ try {
       <div class="faq-answer">The BATC mint and liquidity are not live yet. Their addresses, authority settings, and lock details will be published for independent on-chain verification before launch.</div>
     </details>
 
-    <details class="faq-item" name="faq-group">
-      <summary>
-        <span class="faq-q"><svg data-lucide="rocket" class="icon q-icon"></svg>What happens after the presale ends?</span>
-        <svg data-lucide="chevron-down" class="icon chev"></svg>
-      </summary>
-      <div class="faq-answer">The API verifies the confirmed SOL transfer and records your BATC allocation. Keep your payment transaction signature for your records and follow official BattleCities channels for distribution updates.</div>
-    </details>
 
     <details class="faq-item" name="faq-group">
       <summary>
