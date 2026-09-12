@@ -807,6 +807,11 @@ footer .logo-text{font-size:12px;}
   .cherry-chat-launcher,.cherry-chat-close{transition:none;}
 }
 
+.mission-wallet{display:flex;align-items:center;flex-wrap:wrap;gap:16px;margin:16px 0;color:var(--gray);font-size:13px;}
+.mission-wallet .btn{min-height:44px;}
+.mission-wallet .btn:focus-visible{outline:2px solid var(--white);outline-offset:4px;}
+.mission-wallet .btn:disabled{opacity:.65;cursor:wait;}
+
 /* Extra small phones */
 @media(max-width:380px){
   .hero h1{font-size:24px;}

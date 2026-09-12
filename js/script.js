@@ -1260,6 +1260,37 @@ async function authenticateCherryWallet(provider, walletAddress){
   }
 }
 
+// Mission login is independent of the presale and creates the same signed
+// session consumed by the X and Discord reward endpoints.
+const missionWalletButton = document.getElementById('mission-wallet-connect');
+const missionWalletStatus = document.getElementById('mission-wallet-status');
+missionWalletButton?.addEventListener('click', async () => {
+  missionWalletButton.disabled = true;
+  missionWalletButton.setAttribute('aria-busy', 'true');
+  try {
+    const provider = getCherryWalletProvider();
+    if (!provider) throw new Error('Open this site in Phantom’s browser or install the Phantom extension, then try again.');
+    missionWalletStatus.textContent = 'Approve the wallet connection, then sign in to Battle Cities.';
+    const response = await provider.connect();
+    const publicKey = response?.publicKey || provider.publicKey;
+    if (!publicKey) throw new Error('Unlock Phantom and try again.');
+    await authenticateCherryWallet(provider, publicKey.toString());
+    phantomProvider = provider;
+    bindPhantomEvents(provider);
+    updateWalletUi(publicKey);
+    missionWalletButton.textContent = 'Reconnect Wallet';
+    missionWalletStatus.textContent = `Signed in · ${truncateAddress(publicKey.toString())}`;
+    await Promise.allSettled([refreshXConnection(), refreshDiscordMission()]);
+  } catch (error) {
+    missionWalletStatus.textContent = error.code === 4001
+      ? 'Sign-in cancelled. Connect again when ready.'
+      : error.message || 'Unable to sign in. Please try again.';
+  } finally {
+    missionWalletButton.disabled = false;
+    missionWalletButton.removeAttribute('aria-busy');
+  }
+});
+
 async function requestCherryToken(walletAddress){
   const response = await fetch(CHERRY_TOKEN_ENDPOINT, {
     method: 'POST',
