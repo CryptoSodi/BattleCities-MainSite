@@ -807,10 +807,11 @@ footer .logo-text{font-size:12px;}
   .cherry-chat-launcher,.cherry-chat-close{transition:none;}
 }
 
-.mission-wallet{display:flex;align-items:center;flex-wrap:wrap;gap:16px;margin:16px 0;color:var(--gray);font-size:13px;}
-.mission-wallet .btn{min-height:44px;}
-.mission-wallet .btn:focus-visible{outline:2px solid var(--white);outline-offset:4px;}
-.mission-wallet .btn:disabled{opacity:.65;cursor:wait;}
+.mission-wallet{position:relative;flex-shrink:0;}
+.mission-wallet .navcta{min-height:44px;cursor:pointer;white-space:nowrap;}
+.mission-wallet .navcta:focus-visible{outline:2px solid var(--white);outline-offset:4px;}
+.mission-wallet .navcta:disabled{opacity:.65;cursor:wait;}
+#mission-wallet-status:not(:empty){position:absolute;top:calc(100% + 10px);right:0;width:min(300px,calc(100vw - 28px));padding:12px;background:var(--bg-panel);border:1px solid var(--shop-button-edge);color:var(--white);font-size:13px;line-height:1.5;box-shadow:4px 4px 0 #000;}
 
 /* Extra small phones */
 @media(max-width:380px){
