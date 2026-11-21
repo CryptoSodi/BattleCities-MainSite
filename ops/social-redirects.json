@@ -1,0 +1,7 @@
+[
+  {"path": "/discord", "destination": "https://discord.com/invite/wdWa7SrbQc"},
+  {"path": "/telegram", "destination": "https://t.me/BattleCitiesNews"},
+  {"path": "/community", "destination": "https://t.me/BattleCities"},
+  {"path": "/x", "destination": "https://x.com/BattleCitiesHQ"},
+  {"path": "/links", "destination": "https://linktr.ee/battlecities"}
+]
