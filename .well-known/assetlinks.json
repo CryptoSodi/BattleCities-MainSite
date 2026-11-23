@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "sol.battle.cities",
+      "sha256_cert_fingerprints": [
+        "D3:67:3C:B7:5C:DF:37:46:6D:9C:ED:1D:1F:FD:23:DE:F1:00:34:ED:8B:E2:F0:84:51:20:4C:F7:9F:8F:88:A4"
+      ]
+    }
+  }
+]
